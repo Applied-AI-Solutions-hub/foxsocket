@@ -1,0 +1,11 @@
+# GitHub release checks
+
+The desktop app checks the configured GitHub repository each time its process starts and when reopening a running tray instance. Requests run in the main process, time out after 12 seconds and never delay the workspace. Concurrent requests coalesce. Settings > App updates includes manual checking and the result/time; a new-version banner opens the verified repository release page. Checks do not download or execute installers.
+
+Versions use semantic precedence, including prereleases. Preview builds see preview and stable releases; stable builds skip previews. Drafts, invalid tags and releases without an uploaded Windows executable are skipped. A newer local build is never offered a downgrade. Git commits are not installable versions; publish a versioned GitHub release with its installer.
+
+The current repository is private. Anonymous GitHub API requests cannot enumerate its releases. Each authorized tester can supply their own expiring fine-grained GitHub token scoped to this repository with Contents: Read-only. Organization approval may be needed. Enter it only in Settings > App updates > Private GitHub access. The main process encrypts it through Electron safeStorage for the Windows account, in github-release-access.json under userData. It is never bundled, sent to the renderer, written to logs, included in workspace exports, or shared with other testers. Forget saved access removes this local credential. Public GitHub releases need no token.
+
+Missing/expired access, rate limiting, network failure and no installers each have distinct states. None is reported as up to date. Startup checks work offline by failing quietly; saved work remains available. Apple TestFlight/App Store delivery will retain Apple's update mechanism; Tailscale remains the required Host/Client connection transport, separate from desktop release distribution.
+
+Validation: updates.test.cjs covers semantic comparison, release filtering, link origin, auth/offline/rate failures, downgrade prevention, concurrent checks, token non-disclosure and timeouts. updates-smoke.cjs verifies a real Electron launch triggers one check and displays the update notice/settings/manual recheck/error states.
