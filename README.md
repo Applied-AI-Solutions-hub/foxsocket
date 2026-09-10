@@ -9,7 +9,7 @@ An open-source personal AI desktop workspace by Applied AI Solutions, with Spark
 [Download Foxsocket 0.6.0-alpha.2](https://github.com/Applied-AI-Solutions-hub/foxsocket/releases/tag/v0.6.0-alpha.2)
 
 1. Open the release link and expand **Assets**.
-2. Download **Foxsocket Setup 0.6.0-alpha.2.exe**. The source ZIP is for developers.
+2. Download **Foxsocket.Setup.0.6.0-alpha.2.exe**. The source ZIP is for developers.
 3. Run the installer, choose the installation location, then launch Foxsocket.
 4. Choose **Host** to assess this PC for running an agent. Use the Host page to inspect what is missing.
 
@@ -39,7 +39,7 @@ The clean starter manifest defaults to **Sparky** and allows renaming. It contai
 
 ## Build from source
 
-Use Windows with Node.js 22 or later and pnpm 10:
+Use Windows with Node.js 22 or later and pnpm 11:
 
 ```powershell
 git clone https://github.com/Applied-AI-Solutions-hub/foxsocket.git
