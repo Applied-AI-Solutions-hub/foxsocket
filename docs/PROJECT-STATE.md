@@ -4,6 +4,8 @@ Checkpoint date: 2026-09-11. This is a public coordination record, not live PC t
 
 ## Active hold
 
+Public operating-policy proposal: `docs/PUBLIC-OPERATING-POLICY.md` defines the intended coordinator-led workflow and build-in-public procedures. No coordinator, standing merge grant, new messaging permission or automation was activated by drafting it.
+
 **Pause merges and deployments until local review fixes, remote main and the installed/workflow source are reconciled.** The user has been advised of this hold in the current coordination task. Do not infer that creating this policy PR lifts it. Obtain the user's explicit decision before merging or deploying. Independent scoped branches and draft PRs may continue.
 
 ## Known work

@@ -4,6 +4,8 @@ Owner: Applied AI Solutions. Applies equally to Codex, Grok Bot, Claude, human c
 
 Canonical repository: https://github.com/Applied-AI-Solutions-hub/foxsocket
 
+Business governance and the proposed bounded-delegation workflow are defined in [the public operating policy](docs/PUBLIC-OPERATING-POLICY.md). It explains how we build and learn in public while reducing routine owner handoffs. It is a proposal, not a grant of new authority; current holds and communication limits remain until explicitly changed.
+
 ## 1. Read before acting
 
 At the start of a task, after resuming, and before a merge or deployment:
