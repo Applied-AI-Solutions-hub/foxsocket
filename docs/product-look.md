@@ -6,6 +6,14 @@ Company: Applied AI Solutions (maker credit only — not the product name on the
 North star: [appliedai.solutions](https://appliedai.solutions/) — “Make room for your ideas.”
 Interaction reference: calm chat + one clear question with stacked choices (Grok Bot pattern).
 
+## Mission (why the UI must feel this way)
+
+Foxsocket exists to make **personal AI agents easier to adopt** — on **your own hardware**, in the **cloud**, or both — without turning “run an agent” into a research project.
+
+The product grew out of a real personal-agent setup (local host + chat front door). The public app should carry that intent forward: a calm place to think and work with an agent under your control. The shell should sell **adoption**, not a command-center dashboard.
+
+Design implication: first open = Sparky + one clear question. Host readiness stays honest when setup is incomplete. Wallpaper metrics and feature grids fight the mission.
+
 ## Branding
 
 | Role | Name |
@@ -44,6 +52,7 @@ Brand marks and cinematic assets are strong. The shell naming and chrome are wha
 ## Principles
 
 - Foxsocket is the product; Sparky is the surface you live in.
+- UI serves agent adoption (local hardware and/or cloud), not admin theater.
 - One question at a time; stacked choices, not feature grids.
 - No wallpaper behind working UI. Brand art = marketing / brief startup only.
 - One token set, one radius, one accent usage rule.
