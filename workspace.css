@@ -3,3 +3,24 @@
 @media(min-width:1201px){.app{grid-template-columns:310px minmax(0,1fr) 350px}.app.details-hidden{grid-template-columns:310px minmax(0,1fr)}}.bubble{font-size:16px}.brand h1{font-size:24px}.side-nav button{font-size:15px}.recent{font-size:14px}.details p,.detail-label{font-size:14px}.topbar h2{font-size:23px}.message .mascot{width:56px;height:56px}.message-content{max-width:calc(100% - 68px)}.topbar .mascot{width:58px;height:58px}
 
 .release-notice{flex-shrink:0;margin:8px 16px 0;background:#163b50;border-color:#57d7f0;box-shadow:0 8px 25px #0005;font-size:13px}.release-notice[hidden]{display:none}#release-settings{margin-bottom:24px}#release-settings p{margin:12px 0}#release-settings details{margin-top:20px}#release-settings summary{cursor:pointer}#release-access-form{display:grid;gap:10px;margin:16px 0}#release-token{width:100%;min-width:0;padding:12px;background:#0c1c2b;color:#e9f2ff;border:1px solid #41667d;border-radius:8px}
+
+/* Chat-first empty state: one question, stacked choices (not a feature grid). */
+.empty-chat{max-width:520px;margin:0 auto}
+.empty-chat h2{font-size:clamp(24px,3vw,30px);font-weight:600;letter-spacing:-.8px}
+.choice-card{width:100%;max-width:460px;margin-top:28px;text-align:left;border:1px solid #2f4f66;border-radius:16px;background:#132a3c;padding:18px 16px 14px;box-shadow:0 10px 30px #0003}
+.choice-prompt{font-size:14px;font-weight:600;color:#e7f3ff;margin:0 0 12px}
+.choice-options{display:grid;gap:8px}
+.choice-options .choice{width:100%;justify-content:flex-start;align-items:flex-start;gap:12px;text-align:left;min-height:58px;padding:12px 14px;border:1px solid #31546d;background:#0f2435;border-radius:12px}
+.choice-options .choice:hover{border-color:#57d0ef;background:#153247}
+.choice-options .choice span{display:grid;gap:2px;min-width:0}
+.choice-options .choice strong{font-size:14px;font-weight:600;color:#eaf4ff}
+.choice-options .choice small{font-size:12px;color:#9bb6ce;font-weight:400}
+.choice-options .choice .icon{width:20px;height:20px;margin-top:2px;flex-shrink:0}
+.details .test-badge{display:block;margin-top:18px}
+.lighting-panel{padding-top:16px}
+.lighting-panel>summary{cursor:pointer;display:flex;flex-direction:column;gap:4px;list-style:none;margin-bottom:12px}
+.lighting-panel>summary::-webkit-details-marker{display:none}
+.lighting-panel>summary strong{font-size:16px}
+.lighting-panel[open]>summary{margin-bottom:16px}
+.suggestions{display:none}
+@media(max-width:760px){.choice-card{margin-top:22px;padding:14px 12px}.empty-chat h2{font-size:23px}}

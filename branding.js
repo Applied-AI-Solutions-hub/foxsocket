@@ -5,7 +5,7 @@
   hostName:'Foxsocket Host',
   clientName:'Foxsocket Client',
   maker:'Applied AI Solutions',
-  tagline:'Your agent. Your devices. Connected.',
+  tagline:'Make room for your ideas.',
   namingStatus:'Foxsocket — by Applied AI Solutions',
   shortlist:Object.freeze(['Foxsocket']),
  });
