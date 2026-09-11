@@ -1,12 +1,25 @@
 # Foxsocket
 
-**Your agent. Your devices. Connected.**
+**Make room for your ideas.**
 
-Open-source personal AI desktop workspace by [Applied AI Solutions](https://appliedai.solutions), with Sparky as its mascot.
+Open-source personal AI workspace by [Applied AI Solutions](https://appliedai.solutions). **Sparky** is the agent you talk to inside it.
+
+Foxsocket exists to make **personal AI agents easier to adopt** — on **your own hardware**, in the **cloud**, or both — without turning “run an agent” into a research project. The long-term idea is simple: a calm place to think and work with an agent that stays under your control.
 
 This is an **early Windows alpha** for testers. It is not a finished agent hosting platform yet.
 
 > **Set expectations:** installing Foxsocket alone does **not** yet take a fresh PC all the way to a working agent reply. Host readiness checks and connecting an **existing** OpenClaw agent in WSL are in scope; guided Linux setup, provider/model wizard, and automatic starter provisioning are not.
+
+## Why it exists
+
+Most people should not need a custom Linux stack to try a personal agent. Foxsocket is the product path toward that:
+
+- **You own the relationship** — local-first where it matters; cloud when you choose it
+- **Sparky is the front door** — chat and clear choices, not a dashboard of features
+- **Host readiness is honest** — show what this PC still needs instead of pretending setup is done
+- **Small business, building in public** — early, imperfect, and explicit about what works
+
+The alpha you can install today is still catching up to that story. Tester feedback is how we close the gap.
 
 ## Quick start (Windows testers)
 
