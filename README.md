@@ -90,3 +90,7 @@ See [Contributing](CONTRIBUTING.md) and [Host implementation status](docs/manage
 Original code is [MIT](LICENSE). See [third-party notices](THIRD-PARTY-NOTICES.md).
 
 Existing package and application identifiers stay stable for profile compatibility, so some internal names still refer to Applied AI Command Center.
+
+## Documentation
+
+See the [documentation index](docs/README.md) for current guides, design proposals and historical release notes.

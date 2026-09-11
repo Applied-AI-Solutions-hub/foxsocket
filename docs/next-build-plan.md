@@ -19,6 +19,6 @@ Do not implement decorative success screens that claim setup is complete before 
 
 ## Fresh-PC test
 
-The user is preparing the Lenovo as a fresh Host with no OpenClaw or Tailscale. Prioritize that independent Host journey. The installer and public setup copy must use the current computer's detected details and the user's chosen name; no test-machine name is baked into the product. Test prerequisite decisions, runtime installation, provider choice, a real reply, close/reopen, restart, and recovery. Test Client pairing separately later.
+Use an independent test device with no prior OpenClaw or Tailscale configuration to validate the fresh-Host journey. The installer and public setup copy must use the current computer's detected details and the user's chosen name; no test-machine name is baked into the product. Test prerequisite decisions, runtime installation, provider choice, a real reply, close/reopen, restart, and recovery. Test Client pairing separately later.
 
 The installer now includes role selection and a read-only Windows inventory before app installation. It checks OS, architecture, CPU, RAM, system-drive storage, graphics names, virtualization indicators, restart flags, registered WSL distributions, and Windows command/file presence for Node, OpenClaw, and Tailscale. It does not install prerequisites, inspect credentials, start Linux distributions, verify inference, or certify model compatibility. Missing data is displayed as unknown. Native page layout and clean-PC behavior need manual acceptance.

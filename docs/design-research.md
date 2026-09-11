@@ -29,8 +29,8 @@ Define default, hover, focus, pressed, disabled, busy, and failure states. Prese
 2. Build the working conversation screen, anchored composer, sidebar, and collapsible details panel first.
 3. Compare actual screenshots side by side with the concept at the target size, a smaller laptop window, and Windows scaling of 125% and 150%. Correct visible proportion differences before calling it finished.
 4. Once the real screen is accepted, save its screenshots as regression baselines. Automated comparison protects the accepted result; it cannot judge whether the initial concept was faithfully implemented.
-5. Exercise keyboard navigation, reduced motion, loading, empty, offline, error, and recovery paths. Then test the packaged installer and first launch on the Lenovo.
+5. Exercise keyboard navigation, reduced motion, loading, empty, offline, error, and recovery paths. Then test the packaged installer and first launch on the designated test device.
 
 ## Implementation boundary
 
-The maker splash is being integrated locally into the next-build worktree using the original SVG assets. Native animation still needs visual acceptance before release. No installer has been installed or published for this research task. Rive, DeepSite, and screenshot regression tests are recommendations, not completed integrations. Host pairing and new onboarding remain upcoming work.
+This research proposed integrating the maker splash using the original SVG assets; inspect current source and release evidence for implementation status. Native animation still needs visual acceptance before release. No installer has been installed or published for this research task. Rive, DeepSite, and screenshot regression tests are recommendations, not completed integrations. Host pairing and new onboarding remain upcoming work.
