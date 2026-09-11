@@ -1,11 +1,11 @@
-# Working on two PCs
+# Working across development and test PCs
 
-This folder is the source project. Use the files at its root; an older nested command-center folder may exist and is ignored by Git. The installers folder is shared through OneDrive but excluded from Git.
+Canonical repository: https://github.com/Applied-AI-Solutions-hub/foxsocket
 
-Private repository: https://github.com/Applied-AI-Solutions-hub/applied-ai-command-center
+Use a separate local Git checkout on each device. Fetch before starting, preserve uncommitted work, and submit scoped changes through a branch and pull request. Do not use cloud-folder synchronization as a substitute for Git merges. Do not automatically commit or push another contributor's work.
 
-On the second PC, clone this repository into a separate local working folder. Use GitHub to pull before starting and commit/push when finished. Avoid editing the same OneDrive-synced Git checkout simultaneously on both computers: OneDrive sync is not a replacement for Git merging.
+Install dependencies with `pnpm install --frozen-lockfile`; use `pnpm start` for development and `pnpm dist` to build a Windows installer. See [Contributing](CONTRIBUTING.md) and [setup guidance](docs/fresh-pc-setup.md).
 
-Install Node.js and pnpm, then run pnpm install and pnpm start. Run pnpm dist to build a Windows installer. Each PC needs its own gateway connection and lighting setup. This initial version expects a local Ubuntu-24.04 WSL distribution with OpenClaw and an OpenRGB SDK server on 127.0.0.1:6742. It will not automatically reach Sparky on the other PC.
+Test on an explicitly designated test device and profile. Do not replace a personal assistant installation to test product changes without the owner's explicit authorization. Each device needs its own verified configuration; a cloned checkout does not transfer gateway access, credentials, conversation history, hardware settings or application pairing.
 
-Credentials, chat histories, personal notes and device profiles are not part of this repository. The earlier source folder in Documents/Codex is retained as a backup; make future changes here.
+Track the source commit, built artifact version, installed version and test results separately. Preserve private user data and recovery backups. Remote/mobile pairing and fresh-PC provisioning remain subject to the limitations in [Host status](docs/managed-host.md).

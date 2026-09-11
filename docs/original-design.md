@@ -1,12 +1,12 @@
 # Applied AI Command Center — first-release design
 
-Status: design proposal, September 9, 2026. No application installation or implementation authorized.
+Status: historical design proposal, September 9, 2026. This is not a current implementation or authorization record. See the [documentation index](README.md) for current guidance.
 
 ## Purpose
 An installed Windows application that joins daily priorities, PC status, device lighting and background work. It must operate independently of Codex and provide a reusable foundation for Applied AI Solutions.
 
 ## Evidence and unresolved capability checks
-Read-only Windows inventory identifies a Gigabyte B650 UD AX-Y1 board, Ryzen 7 7800X3D, NVIDIA RTX 5060 Ti and approximately 32 GB RAM. RGB Fusion 3.24.1202.1, SignalRGB 2.5.77 and Tailscale 1.102.3 are installed. WSL lists Ubuntu-24.04; listing alone does not establish its version, health, running state or gateway configuration. Mouse reports HID VID_1BCF/PID_08A0; retail model and lighting support remain unknown. LED controllers, zones and current controlling application remain unverified.
+Hardware, lighting controllers, installed services and gateway availability must be assessed on each test device. No individual developer machine inventory is a product requirement.
 
 SignalRGB documents a local API, with most endpoints requiring Pro. Installed-version support, entitlement and device capabilities must be verified before choosing this adapter. Do not promise mouse lighting, battery telemetry or remapping based solely on HID detection.
 Source: https://docs.signalrgb.com/developer/signalrgb-api/introduction/
@@ -68,28 +68,6 @@ Keep adapters, branding tokens and personal settings separate. Maintain versione
 ## Decisions needed
 Current lighting application and controlled zones; mouse retail model; desired first three daily actions; gateway purpose (agents, remote access, automation or files); whether availability beyond Windows sign-in is required. These do not block screen planning, but they block a verified device integration commitment.
 
-## Device clarification and runtime evidence
-User identifies the mouse as Skytech Gaming and confirms a keyboard should be included. Exact mouse and keyboard models, keyboard brand, and software-controlled lighting capabilities remain unverified. Include separate keyboard and mouse cards with capability-based lighting, connection and profile controls; do not assume macros, remapping or battery readings exist. Model labels may be entered manually when Windows exposes only generic HID descriptions.
-Read-only process check found SignalRgb, SignalRgbLauncher and SignalRgbService running. This does not prove device ownership or Pro entitlement. WSL verbose inventory confirms Ubuntu-24.04 is Running with VERSION 2; no distribution was started or configured by this check.
-Next compatibility evidence: whether mouse and keyboard appear individually in SignalRGB Devices, and their displayed names. Devices absent from the application may have hardware-only lighting; determine this before including synchronized control in release scope.
+## Historical scope
 
-## Local API feasibility result
-A read-only GET to the documented SignalRGB /api/v1/lighting endpoint returned HTTP 403 Forbidden. The local server is reachable, but this endpoint is not accessible in the current session. Official documentation associates Pro-required endpoint 403 responses with an unsigned-in user or missing Pro entitlement; this response does not determine which condition applies. No authentication, subscription or application setting was changed. Scene control through this API remains blocked pending entitlement/access verification. Do not purchase or enable anything as part of design.
-
-## Devices screen interaction specification
-Use three initial categories: PC lighting, mouse, keyboard. Each device card presents identity, connection, controller, capability status and last check. The PC lighting card lists verified zones only; do not infer fan count from motherboard identity. Unknown devices show “Compatibility not yet verified.” A hardware-only device can remain in the user's inventory with a note explaining its physical controls; it must not display a working software color picker. An API access failure appears at the integration level and does not imply disconnected hardware. Modes display which devices will participate before application, with unavailable devices clearly excluded and explained.
-
-## SignalRGB screenshot evidence supplied by user
-The supplied Photo 1 shows a Gigabyte B650 UD AX-Y1 controller under Fan & RGB Controllers, and two Aura Compatible RAM entries under Other Devices. User reports mouse and keyboard are not listed. The ASUS keyboard at the top is a promotional banner, not a detected device. This confirms discovery of the motherboard controller and two RAM lighting entries, not successful API control, attached fan/strip topology, or mouse/keyboard incompatibility. First-release device design should show these discovered PC components and retain mouse/keyboard lighting as unverified pending exact model information. Do not interpret the controller badge marked 10 as ten fans or zones without further evidence.
-
-## Peripheral label photos
-User supplied underside photos. Keyboard label clearly identifies Skytech Gaming K-1000. Mouse label appears to read Skytech Gaming M-1200N; retain tentative transcription because the photo is soft. Current search of official Skytech sources did not establish a model-specific software lighting interface. SignalRGB supported-device search surfaced Skytech prebuilt PCs but did not establish support for these peripheral models (https://signalrgb.com/devices/). Combined with the user's device screen, synchronized peripheral lighting remains unverified, not conclusively impossible. Design them as identified accessories with lighting control unavailable pending demonstrated support. Continue PC-centered design without requiring replacement peripherals or a paid subscription.
-
-## User direction: optional integration failures must not block progress
-User explicitly directs that unresolved mouse/keyboard lighting must not bottleneck the command center; check existing open-source solutions on GitHub or Hugging Face, then defer unsupported details. This supersedes treating peripheral compatibility as a blocker for design completion. Preserve the integration extension points and explicit unverified status.
-Targeted searches found no verified ready-to-use solution for these exact Skytech models on GitHub or Hugging Face. An OpenRGB upstream device request references USB 1bcf:08a0, matching the detected mouse ID: https://gitlab.com/CalcProgrammer1/OpenRGB/-/issues/3513 . This is a research lead, not proof of model compatibility or working support; no linked software was downloaded or executed.
-
-## Home screen decisions for review
-Default landing page has Today at upper left (three priorities, quick add, note and timer), PC status at upper right (CPU/GPU, memory, storage, uptime with timestamps), and a full-width mode strip below. Lower area shows meaningful activity and selected quick actions: Add task, Start focus, Open folder and View devices. Gateway is a compact status card with unavailable/unconfigured states, never a mandatory setup gate. Agents are hidden until an integration exists. Personal task and UI accent changes work independently of peripheral lighting. Main scene actions report which verified devices participate. Preserve the reference's dark navy/cyan appearance and compact sidebar; reserve cinematic branding for the header and welcome view.
-First-release design can proceed with the confirmed PC inventory and conditional device controls. The next review concerns daily workflow and visual hierarchy, not peripheral procurement or reverse engineering. Implementation still requires a separate user instruction.
-
+Personal device inventories, screenshots and local incident notes are omitted. Assess optional hardware on each test device; integration failures must not block core conversation and workspace behavior. This proposal does not establish implemented or released functionality.
