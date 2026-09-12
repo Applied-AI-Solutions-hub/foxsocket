@@ -1,0 +1,4 @@
+{
+  "name": "Foxsocket",
+  "install": "pnpm install --frozen-lockfile && node build-ui.mjs"
+}
