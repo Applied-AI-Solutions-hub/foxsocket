@@ -3,3 +3,6 @@
 @media(min-width:1201px){.app{grid-template-columns:310px minmax(0,1fr) 350px}.app.details-hidden{grid-template-columns:310px minmax(0,1fr)}}.bubble{font-size:16px}.brand h1{font-size:24px}.side-nav button{font-size:15px}.recent{font-size:14px}.details p,.detail-label{font-size:14px}.topbar h2{font-size:23px}.message .mascot{width:56px;height:56px}.message-content{max-width:calc(100% - 68px)}.topbar .mascot{width:58px;height:58px}
 
 .release-notice{flex-shrink:0;margin:8px 16px 0;background:#163b50;border-color:#57d7f0;box-shadow:0 8px 25px #0005;font-size:13px}.release-notice[hidden]{display:none}#release-settings{margin-bottom:24px}#release-settings p{margin:12px 0}#release-settings details{margin-top:20px}#release-settings summary{cursor:pointer}#release-access-form{display:grid;gap:10px;margin:16px 0}#release-token{width:100%;min-width:0;padding:12px;background:#0c1c2b;color:#e9f2ff;border:1px solid #41667d;border-radius:8px}
+
+.chip.good{border-color:#3fbf94;background:#123a30;color:#8ff0cf}
+.capability-note{color:var(--muted);font-size:13px;margin:12px 0 0;line-height:1.6}
