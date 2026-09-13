@@ -7,6 +7,7 @@ Reviewed 2026-09-11 against main `64da418`. The published release, current sourc
 - [Project overview and released installer](../README.md)
 - [Fresh-PC setup and limitations](fresh-pc-setup.md)
 - [Managed Host implementation status](managed-host.md)
+- [Real-hardware acceptance checklist](real-hardware-acceptance.md)
 - [Product architecture and source map](architecture-and-routes.md)
 - [Release checks](updates.md)
 - [Contributing](../CONTRIBUTING.md)
