@@ -33,13 +33,26 @@
     const specs=`<div class="device-metrics"><div><small>Graphics</small><strong style="font-size:14px">${esc(hw.gpuName||'None detected')}</strong></div><div><small>Video memory</small><strong>${hw.gpuName?hw.vramGB+' GB':'—'}</strong></div><div><small>Free disk</small><strong>${hw.diskKnown?hw.freeDiskGB+' GB':'Unknown'}</strong></div></div>`;
     const eligible=a.advice==='local'?`<p class="capability-note">Fits on this PC: ${a.runnable.map(id=>esc(a.catalog.find(m=>m.id===id).label)).join(' · ')}</p>`:'';
     const action=a.advice==='local'
-      ?`<div class="actions"><button class="primary" disabled>Set up local model</button><button class="link" data-page="setup">Or connect a cloud provider</button></div><p class="capability-note">Guided local setup is coming soon. Nothing is downloaded or started until you confirm.</p>`
-      :`<div class="actions"><button class="primary" data-page="setup">Connect your model</button></div><p class="capability-note">You can plug in your own provider now. Guided local setup unlocks on eligible hardware.</p>`;
+      ?`<div class="actions"><button class="primary" data-page="model">Set up local model</button><button class="link" data-page="model">Or connect a cloud provider</button></div><p class="capability-note">Guided local setup is coming soon. Nothing is downloaded or started until you confirm.</p>`
+      :`<div class="actions"><button class="primary" data-page="model">Connect your model</button></div><p class="capability-note">You can plug in your own provider now. Guided local setup unlocks on eligible hardware.</p>`;
     return `<section class="panel"><div class="panel-head"><h2>Run a model on this PC</h2><span class="chip ${a.canRunLocally?'good':''}">${a.canRunLocally?'Local model ready':'Cloud recommended'}</span></div><p>Foxsocket reads this computer’s hardware locally to suggest how your agent could run. This check is read-only and stays on this device — no data is uploaded, and nothing is installed or started until you choose to.</p>${specs}<div class="notice">${esc(a.reason)}</div>${eligible}${action}</section>`;
   }
   function reportHtml(r){
     const cls={pass:'good',warn:'warn',fail:'bad'};
     return `<div class="notice">${esc(r.summary)}</div><div class="diag-checks">${r.checks.map(c=>`<div class="diag-check"><span class="chip ${cls[c.status]||''}">${esc(c.status)}</span><div><strong>${esc(c.label)}</strong><small>${esc(c.detail)}</small></div></div>`).join('')}</div><p class="capability-note">${esc(r.privacy)}</p><details class="diag-details"><summary>Full report (safe to share)</summary><pre class="diag-json">${esc(JSON.stringify(r,null,2))}</pre></details>`;
+  }
+  function modelPage(){
+    const cap=metrics?window.capability.assess(metrics):null;
+    const exec=state.setup.execution,provider=state.setup.provider;
+    const providers=[['openai','OpenAI'],['anthropic','Anthropic'],['google','Google'],['custom','Custom (OpenAI-compatible)']];
+    const recNote=cap?cap.reason:'Run diagnostics on the Devices page to tailor this to your PC.';
+    const localSub=cap?(cap.advice==='local'?'Recommended for this PC — conversations can stay on this device.':'Best on a PC with a capable GPU; this one looks better suited to a cloud model.'):'Keeps conversations on this device when the hardware supports it.';
+    const choose=`<div class="role-grid"><button class="role-card ${exec==='local'?'selected':''}" data-choose-exec="local">${icon('system')}<strong>Run it on this PC</strong><p>${esc(localSub)}</p></button><button class="role-card ${exec==='cloud'?'selected':''}" data-choose-exec="cloud">${icon('integrations')}<strong>Bring your model (cloud)</strong><p>Use your own provider account. Fast to start; runs in the cloud.</p></button></div>`;
+    let detail='';
+    if(exec==='cloud')detail=`<section class="panel"><h2>Choose a provider</h2><div class="provider-grid">${providers.map(([id,name])=>`<button class="provider ${provider===id?'selected':''}" data-provider="${id}">${esc(name)}</button>`).join('')}</div>${provider?'<div class="actions"><button class="primary" data-action="connect-openclaw">Continue in OpenClaw</button></div>':'<p class="capability-note">Pick a provider to continue.</p>'}</section>`;
+    else if(exec==='local'){const tier=cap&&cap.recommended?(cap.catalog.find(m=>m.id===cap.recommended)||{}).label:null;detail=`<section class="panel"><h2>Run locally</h2><p>${cap&&cap.canRunLocally?`This PC can run ${esc(tier||'a local model')}. Guided download and start is coming soon — nothing runs until you confirm.`:'This PC does not currently meet the bar for a local model. You can still choose a cloud provider above.'}</p><div class="actions"><button class="primary" disabled>Set up local model</button></div></section>`;}
+    const security=`<div class="notice"><strong>Your keys stay yours.</strong> Foxsocket never stores your provider keys or passwords. You enter them in OpenClaw’s own secure prompt or your provider’s sign-in page — never in this app, its logs, or its diagnostics. This screen only remembers which option you picked.</div>`;
+    return intro('Connect your model','Two ways to power your agent. Pick what fits this PC — you stay in control of your data.')+`<div class="notice">${esc(recNote)}</div>${choose}${detail}${security}<div class="actions"><button class="link" data-page="devices">See what this PC can run</button><button class="link" data-page="chat">Use workspace for now</button></div>`;
   }
   function diagnosticsPanel(){
     return `<section class="panel"><div class="panel-head"><h2>Readiness diagnostics</h2>${diagnosticsReport?'<button data-action="copy-report">Copy report</button>':''}</div><p>Check this PC’s readiness locally. The report stays on your device — no credentials, file paths, or network addresses — and nothing is uploaded.</p><div class="actions"><button class="primary" data-action="self-test">Run diagnostics</button></div>${diagnosticsReport?reportHtml(diagnosticsReport):''}</section>`;
@@ -59,7 +72,7 @@
   }
   function render(){
     retain();sidebar();header();details();document.body.dataset.page=page;
-    $('#content').innerHTML=page==='chat'?chat():`<div class="page-scroll"><div class="page-inner">${({files,tasks,devices,settings,setup:setupPage})[page]()}</div></div>`;
+    $('#content').innerHTML=page==='chat'?chat():`<div class="page-scroll"><div class="page-inner">${({files,tasks,devices,settings,setup:setupPage,model:modelPage})[page]()}</div></div>`;
     if(page==='chat'){$('#chat-input').value=draft;resize();const m=$('#messages');m.scrollTop=atBottom?m.scrollHeight:scroll;}
     window.appEffects?.render(page);window.releaseUpdates?.render();
   }
@@ -81,6 +94,8 @@
       if(b.dataset.copy!==undefined){await navigator.clipboard.writeText(state.chat[Number(b.dataset.copy)].text);toast('Response copied.');}
       if(b.dataset.role){rolePicker=false;state.setup=await api.invoke('setup-save',{role:b.dataset.role,deviceName:$('#device-name').value});await checkPc();render();if(state.setup.role==='host')await checkHost();}
       if(b.dataset.step)await goStep(b.dataset.step);
+      if(b.dataset.chooseExec){state.setup=await api.invoke('setup-save',{execution:b.dataset.chooseExec});render();}
+      if(b.dataset.provider){state.setup=await api.invoke('setup-save',{provider:b.dataset.provider});render();}
       if(b.dataset.host==='scan'){await checkPc();render();await checkHost();}
       if(b.dataset.host==='check')await checkHost();
       if(b.dataset.host==='prepare'){if(sending)throw Error('Wait for the current reply to finish.');host={phase:'checking',busy:true};render();try{await api.invoke('host-prepare',selectedDistro);}catch(e){host={phase:'attention',busy:false,error:e.message};render();}}
@@ -95,6 +110,7 @@
         case 'export':if(await api.invoke('export'))toast('Workspace backup saved.');break;
         case 'self-test':diagnosticsReport=await api.invoke('self-test');render();break;
         case 'copy-report':if(diagnosticsReport){await navigator.clipboard.writeText(JSON.stringify(diagnosticsReport,null,2));toast('Diagnostics report copied.');}break;
+        case 'connect-openclaw':await api.invoke('setup-command',{step:'provider',distro:selectedDistro});toast('Command copied. Paste it into your Ubuntu terminal to connect your model in OpenClaw — enter keys there, never here.');break;
         case 'help':$('#help-text').textContent=(await api.invoke('setup-help')).guide;$('#help').showModal();break;
         case 'check-pc':await checkPc();render();break;
         case 'find-agents':await findAgents();break;

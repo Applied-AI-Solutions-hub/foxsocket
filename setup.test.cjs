@@ -30,6 +30,17 @@ test('renderer cannot supply readiness, change device identity, or store credent
   assert.throws(() => setup.update(null, { role: 'client', step: 'provider' }));
   assert.throws(() => setup.record({ schemaVersion: 99 }));
 });
+test('model execution and provider choices are validated, stored, and cannot smuggle credentials', () => {
+  const chosen = setup.update(setup.record(null), { execution: 'cloud', provider: 'openai' });
+  assert.equal(chosen.execution, 'cloud');
+  assert.equal(chosen.provider, 'openai');
+  assert.equal(setup.update(chosen, { execution: 'local' }).execution, 'local');
+  assert.throws(() => setup.update(null, { execution: 'quantum' }));
+  assert.throws(() => setup.update(null, { provider: 'not a valid id!' }));
+  // The choice path must never become a place to store secrets.
+  assert.throws(() => setup.update(null, { apiKey: 'sk-secret' }));
+  assert.throws(() => setup.update(null, { token: 'secret' }));
+});
 test('fresh Windows PC reports missing prerequisites without executing installers', async () => {
   const calls = [];
   const result = await setup.inspect({ platform: 'win32', env: {}, exists: () => false, execute: async (exe, args) => {

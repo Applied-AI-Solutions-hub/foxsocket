@@ -14,6 +14,7 @@
     "test:setup": "node --test setup.test.cjs",
     "test:capability": "node --test capability.test.cjs",
     "test:diagnostics": "node --test diagnostics.test.cjs",
+    "test:model-ui": "node build-ui.mjs && electron model-smoke.cjs",
     "render:maker": "node build/render-maker.cjs",
     "update:local": "powershell -NoProfile -ExecutionPolicy Bypass -File build/update-local.ps1",
     "test:updates": "node --test updates.test.cjs",

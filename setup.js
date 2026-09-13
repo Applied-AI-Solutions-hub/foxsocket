@@ -19,14 +19,14 @@ function record(previous, deviceName = os.hostname()) {
   if (previous && previous.schemaVersion !== 1) throw Error('This setup record needs a newer app version.');
   return previous || {
     schemaVersion: 1, deviceId: crypto.randomUUID(), deviceName,
-    role: null, step: 'role', agentName: 'My assistant', updatedAt: Date.now()
+    role: null, step: 'role', agentName: 'My assistant', execution: null, provider: null, updatedAt: Date.now()
   };
 }
 function update(previous, patch) {
   if (!patch || typeof patch !== 'object' || Array.isArray(patch)) throw Error('Invalid setup choices.');
   const next = { ...record(previous) };
   for (const key of Object.keys(patch)) {
-    if (!['role', 'step', 'deviceName', 'agentName'].includes(key)) throw Error('That setup field cannot be changed.');
+    if (!['role', 'step', 'deviceName', 'agentName', 'execution', 'provider'].includes(key)) throw Error('That setup field cannot be changed.');
   }
   if ('role' in patch) {
     if (typeof patch.role !== 'string' || !Object.hasOwn(steps, patch.role)) throw Error('Choose Host or Client.');
@@ -39,6 +39,16 @@ function update(previous, patch) {
       throw Error('Enter a name between 1 and 64 characters.');
     }
     next[key] = patch[key].trim();
+  }
+  // Model choice, not credentials: execution is where the model runs, provider is
+  // a catalog id. Keys/passwords are never accepted here — they belong in OpenClaw.
+  if ('execution' in patch) {
+    if (patch.execution !== 'cloud' && patch.execution !== 'local') throw Error('Choose cloud or local execution.');
+    next.execution = patch.execution;
+  }
+  if ('provider' in patch) {
+    if (typeof patch.provider !== 'string' || !/^[\w.-]{1,64}$/.test(patch.provider)) throw Error('Choose a valid provider.');
+    next.provider = patch.provider;
   }
   if ('step' in patch) {
     if (!(steps[next.role] || ['role']).includes(patch.step)) throw Error('Unknown setup step.');

@@ -25,8 +25,8 @@ app.whenReady().then(async()=>{
    check(panel.querySelector('.chip.good')&&panel.querySelector('.chip.good').textContent.includes('Local model ready'),'Gaming GPU shows Local model ready');
    check(text.includes('NVIDIA GeForce RTX 4090')&&text.includes('24 GB'),'Detected GPU and VRAM are shown');
    check(text.includes('Large model'),'Recommends the largest fitting tier');
-   check(panel.querySelector('button.primary[disabled]'),'No live action is triggered (setup is honestly gated)');
-   return {loaded:true,localReady:true,educates:true,recommendsLarge:true,noAutoAction:true};
+   check(panel.querySelector('[data-page=model]'),'Panel routes to the guided Connect-your-model screen (no download/start happens here)');
+   return {loaded:true,localReady:true,educates:true,recommendsLarge:true,routesToSetup:true};
   })()`);
   fs.writeFileSync(path.join(__dirname,'.qa','capability-results.json'),JSON.stringify(result,null,2));
   fs.writeFileSync(path.join(__dirname,'.qa','capability-local.png'),(await win.webContents.capturePage()).toPNG());
