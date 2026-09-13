@@ -110,7 +110,7 @@
         case 'export':if(await api.invoke('export'))toast('Workspace backup saved.');break;
         case 'self-test':diagnosticsReport=await api.invoke('self-test');render();break;
         case 'copy-report':if(diagnosticsReport){await navigator.clipboard.writeText(JSON.stringify(diagnosticsReport,null,2));toast('Diagnostics report copied.');}break;
-        case 'connect-openclaw':await api.invoke('setup-command',{step:'provider',distro:selectedDistro});toast('Command copied. Paste it into your Ubuntu terminal to connect your model in OpenClaw — enter keys there, never here.');break;
+        case 'connect-openclaw':if(!inventory)await checkPc();await api.invoke('setup-command',{step:'provider',distro:selectedDistro});toast('Command copied. Paste it into your Ubuntu terminal to connect your model in OpenClaw — enter keys there, never here.');break;
         case 'help':$('#help-text').textContent=(await api.invoke('setup-help')).guide;$('#help').showModal();break;
         case 'check-pc':await checkPc();render();break;
         case 'find-agents':await findAgents();break;
