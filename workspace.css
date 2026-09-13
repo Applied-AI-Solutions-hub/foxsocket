@@ -6,3 +6,12 @@
 
 .chip.good{border-color:#3fbf94;background:#123a30;color:#8ff0cf}
 .capability-note{color:var(--muted);font-size:13px;margin:12px 0 0;line-height:1.6}
+
+.diag-checks{display:flex;flex-direction:column;gap:10px;margin:14px 0}
+.diag-check{display:flex;gap:12px;align-items:flex-start}
+.diag-check .chip{flex:none;text-transform:capitalize;min-width:54px;text-align:center}
+.diag-check small{display:block;color:var(--muted);margin-top:2px;line-height:1.5}
+.chip.warn{border-color:#c99a3b;background:#3a2f12;color:#f0d18f}
+.chip.bad{border-color:#c9553b;background:#3a1712;color:#f0a58f}
+.diag-details{margin-top:14px}.diag-details summary{cursor:pointer;color:var(--muted)}
+.diag-json{white-space:pre-wrap;word-break:break-word;max-height:280px;overflow:auto;background:#0c1c2b;border:1px solid #294356;border-radius:8px;padding:12px;font-family:ui-monospace,Consolas,monospace;font-size:12px;color:#bad6e8}
