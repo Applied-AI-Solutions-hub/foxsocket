@@ -15,12 +15,16 @@
     "render:maker": "node build/render-maker.cjs",
     "update:local": "powershell -NoProfile -ExecutionPolicy Bypass -File build/update-local.ps1",
     "test:updates": "node --test updates.test.cjs",
-    "test:host": "node --test host-manager.test.cjs"
+    "test:host": "node --test host-manager.test.cjs",
+    "test:build": "node --test build-ui.test.cjs"
   },
   "devDependencies": {
+    "@awesome.me/webawesome": "^3.12.0",
+    "animejs": "^4.5.0",
     "electron": "^40.0.0",
     "electron-builder": "^26.0.12",
     "esbuild": "^0.28.2",
+    "motion": "^13.2.0",
     "sharp": "^0.35.4"
   },
   "build": {
@@ -72,9 +76,6 @@
     }
   },
   "dependencies": {
-    "@awesome.me/webawesome": "^3.12.0",
-    "animejs": "^4.5.0",
-    "motion": "^13.2.0",
     "openrgb-sdk": "^0.6.0"
   }
 }
