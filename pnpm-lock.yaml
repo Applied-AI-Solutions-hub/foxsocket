@@ -8,28 +8,28 @@ importers:
 
   .:
     dependencies:
+      openrgb-sdk:
+        specifier: ^0.6.0
+        version: 0.6.0
+    devDependencies:
       '@awesome.me/webawesome':
         specifier: ^3.12.0
         version: 3.12.0(@floating-ui/utils@0.2.12)(@types/node@24.13.3)(@types/react@19.2.18)
       animejs:
         specifier: ^4.5.0
         version: 4.5.0
-      motion:
-        specifier: ^13.2.0
-        version: 13.2.0
-      openrgb-sdk:
-        specifier: ^0.6.0
-        version: 0.6.0
-    devDependencies:
       electron:
-        specifier: ^40.0.0
-        version: 40.10.6(supports-color@7.2.0)
+        specifier: 44.3.0
+        version: 44.3.0(supports-color@7.2.0)
       electron-builder:
         specifier: ^26.0.12
         version: 26.15.3(electron-builder-squirrel-windows@26.15.3)(supports-color@7.2.0)
       esbuild:
         specifier: ^0.28.2
         version: 0.28.2
+      motion:
+        specifier: ^13.2.0
+        version: 13.2.0
       sharp:
         specifier: ^0.35.4
         version: 0.35.4(@types/node@24.13.3)
@@ -517,9 +517,6 @@ packages:
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
 
-  '@types/node@22.20.1':
-    resolution: {integrity: sha512-EANqOCF9QFyra+4pfxUcX9STKJpCLjMbObVzljIJomAWSnuSIEAvyzEU53GaajbXJEgdh0iEcPL+DGvpUd4k1Q==}
-
   '@types/node@24.13.3':
     resolution: {integrity: sha512-Dh8vAsV36ig5wa9OX4pXvMc9D3Veibfw2wix0CUwYODLD8nkj9UsLjASr49nPg+2eKzxhBV+v7L8pXvT4e639Q==}
 
@@ -805,8 +802,8 @@ packages:
     resolution: {integrity: sha512-bO3y10YikuUwUuDUQRM4KfwNkKhnpVO7IPdbsrejwN9/AABJzzTQ4GeHwyzNSrVO+tEH3/Np255a3sVZpZDjvg==}
     engines: {node: '>=8.0.0'}
 
-  electron@40.10.6:
-    resolution: {integrity: sha512-TGjlkOU9Lg6K4KjDbsErywCWCIDaNgLh0q+xj0nlpRoQhevI7VBIxBTtJI/V30lypyLAaXMpnP9O9jui1/qRFw==}
+  electron@44.3.0:
+    resolution: {integrity: sha512-St9EV7F2VtYaYWD2qaAjBwUgKxx39eJOUsUJ5+/1113sqbVfNqv4Dbm/W1rN7qmYSPa+mWwR6yr+b7MfgjgVfQ==}
     engines: {node: '>= 22.12.0'}
     hasBin: true
 
@@ -1487,9 +1484,6 @@ packages:
     resolution: {integrity: sha512-34R7HTnG0XIJcBSn5XhDd7nNFPRcXYRZrBB2O2jdKqYODldSzBAqzsWoZYYvduky73toYS/ESqxPvkDf/F0XMg==}
     engines: {node: '>=10'}
 
-  undici-types@6.21.0:
-    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
-
   undici-types@7.18.2:
     resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
 
@@ -1990,7 +1984,7 @@ snapshots:
     dependencies:
       '@types/http-cache-semantics': 4.2.0
       '@types/keyv': 3.1.4
-      '@types/node': 22.20.1
+      '@types/node': 24.13.3
       '@types/responselike': 1.0.3
 
   '@types/debug@4.1.13':
@@ -1999,19 +1993,15 @@ snapshots:
 
   '@types/fs-extra@9.0.13':
     dependencies:
-      '@types/node': 22.20.1
+      '@types/node': 24.13.3
 
   '@types/http-cache-semantics@4.2.0': {}
 
   '@types/keyv@3.1.4':
     dependencies:
-      '@types/node': 22.20.1
+      '@types/node': 24.13.3
 
   '@types/ms@2.1.0': {}
-
-  '@types/node@22.20.1':
-    dependencies:
-      undici-types: 6.21.0
 
   '@types/node@24.13.3':
     dependencies:
@@ -2023,7 +2013,7 @@ snapshots:
 
   '@types/responselike@1.0.3':
     dependencies:
-      '@types/node': 22.20.1
+      '@types/node': 24.13.3
 
   '@types/trusted-types@2.0.7': {}
 
@@ -2367,7 +2357,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron@40.10.6(supports-color@7.2.0):
+  electron@44.3.0(supports-color@7.2.0):
     dependencies:
       '@electron-internal/extract-zip': 1.0.5
       '@electron/get': 5.1.0(supports-color@7.2.0)
@@ -3091,8 +3081,6 @@ snapshots:
 
   type-fest@0.13.1:
     optional: true
-
-  undici-types@6.21.0: {}
 
   undici-types@7.18.2: {}
 

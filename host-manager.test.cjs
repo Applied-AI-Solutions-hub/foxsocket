@@ -3,12 +3,16 @@ const {createManager,clawArgs}=require('./host-manager');
 function fixture(changes={}){
  const flags={runtime:true,configured:true,systemd:true,service:true,running:true,restart:true,enabled:true,linger:true,boot:true,reachable:true,...changes},calls=[],events=[];
  const execute=async(exe,args)=>{calls.push(args);const ok=output=>({ok:true,output}),fail=()=>({ok:false,output:''});
-  if(args.includes('--version'))return flags.runtime?ok('OpenClaw 2026.9.3'):fail();
+  if(args.includes('true'))return flags.warmFail?fail():ok('');
+  if(args.some(x=>x.includes('command -v openclaw')))return flags.locateTimeout?{ok:false,output:'',timedOut:true}:flags.locateFail?fail():ok(flags.locateMalformed?'noise':flags.runtime?'present':'missing');
+  if(args.includes('--version'))return flags.timeout?{ok:false,output:'',timedOut:true}:flags.broken?fail():flags.badVersion?ok('unrecognized'):flags.runtime?ok('OpenClaw 2026.9.3'):fail();
   if(args.includes('ps'))return ok(flags.systemd?'systemd':'init');
   if(args.some(x=>x.startsWith('test -s')))return flags.configured?ok(''):fail();
   if(args.includes('id'))return ok('hostuser');
   if(args.includes('show-user'))return ok('Linger='+(flags.linger?'yes':'no'));
   if(args.includes('enable-linger')){flags.linger=true;return ok('');}
+  if(args.includes('show')&&flags.serviceProbeTimeout)return {ok:false,output:'',timedOut:true};
+  if(args.includes('show')&&flags.serviceProbeFail)return fail();
   if(args.includes('show'))return ok(`LoadState=${flags.service?'loaded':'not-found'}\nActiveState=${flags.running?'active':'inactive'}\nSubState=${flags.running?'running':'dead'}\nUnitFileState=${flags.enabled?'enabled':'disabled'}\nRestart=${flags.restart?'always':'no'}\nMainPID=${flags.running?'123':'0'}`);
   if(args.includes('health'))return ok(JSON.stringify({ok:flags.reachable,secret:'must-not-leak'}));
   if(args.includes('install')){if(flags.failService)return fail();flags.service=true;return ok('');}
@@ -31,6 +35,9 @@ test('foreground gateway is not killed or duplicated',async()=>{
 test('fresh runtime install stops at account configuration, never claims ready',async()=>{
  const f=fixture({runtime:false,configured:false,service:false,running:false,reachable:false,boot:false});const r=await f.manager.prepare('Ubuntu-24.04');assert.equal(r.issue,'configuration');assert.equal(r.checks.runtime,true);assert.ok(f.events.some(s=>s.phase==='installing'));assert.ok(!f.calls.some(a=>a.includes('install')));
 });
+test('a probe that times out is reported, never treated as a missing runtime',async()=>{
+ const f=fixture({timeout:true});const r=await f.manager.prepare('Ubuntu-24.04');assert.equal(r.issue,'timeout');assert.equal(r.checks,null);assert.ok(f.calls[0].includes('true'));assert.ok(!f.events.some(s=>s.phase==='installing'));assert.ok(!f.calls.some(a=>a.some(x=>x.includes('https://'))));
+});
 test('unsupported Linux is blocked before downloading',async()=>{
  const f=fixture({systemd:false,runtime:false});const r=await f.manager.prepare('Ubuntu-24.04');assert.equal(r.issue,'systemd');assert.ok(!f.calls.some(a=>a.some(x=>x.includes('https://'))));
 });
@@ -44,3 +51,9 @@ test('unknown distro rejects all commands, and duplicate jobs coalesce',async()=
 test('OpenClaw arguments remain positional rather than interpolated into shell',()=>{
  const message='hello; $(touch /tmp/nope)';const args=clawArgs('Ubuntu-24.04',['agent','--message',message]);assert.equal(args.at(-1),message);assert.ok(!args[5].includes(message));
 });
+
+for(const flags of [{warmFail:true},{broken:true},{badVersion:true}])test('failed runtime inspection never starts a replacement '+JSON.stringify(flags),async()=>{const f=fixture(flags);const r=await f.manager.prepare('Ubuntu-24.04');assert.equal(r.issue,'probe');assert.ok(!f.events.some(s=>s.phase==='installing'));assert.ok(!f.calls.some(a=>a.some(x=>x.includes('https://'))));});
+
+for(const flags of [{locateTimeout:true},{locateFail:true},{locateMalformed:true}])test('uncertain executable discovery blocks installation '+JSON.stringify(flags),async()=>{const f=fixture(flags);const r=await f.manager.prepare('Ubuntu-24.04');assert.equal(r.issue,flags.locateTimeout?'timeout':'probe');assert.ok(!f.events.some(s=>s.phase==='installing'));});
+
+for(const flags of [{serviceProbeTimeout:true},{serviceProbeFail:true}])test('uncertain service state blocks all installs '+JSON.stringify(flags),async()=>{const f=fixture({...flags,reachable:false});await f.manager.prepare('Ubuntu-24.04');assert.ok(!f.calls.some(a=>a.includes('install')||a.some(x=>x.includes('https://'))));});

@@ -1,108 +1,20 @@
-# Fresh-PC setup: beginner walkthrough
+# Set up a Foxsocket Host
 
-Prepared September 10, 2026. This guide is bundled with the app so setup help does not depend on having a working agent. Version 0.6.0-alpha.1 includes guided local Host setup. Installation commands run in user-opened terminals, with instructions and checkpoints inside the app. Remote Client pairing is planned and is not implemented in this alpha.
+This alpha supports local Windows Hosts with an existing WSL Linux environment. Client pairing and the integrated provider-account wizard are not available yet.
 
-## First, choose what this computer will do
+1. Complete Windows setup and pending restarts. Install WSL and finish creating a regular Linux user if the readiness check reports them missing. Linux must use systemd.
+2. Choose Host in Foxsocket, select the detected distribution, and check its status.
+3. Choose Prepare Host. Foxsocket first checks the environment. Only confirmed absence of OpenClaw permits download. The bootstrap script is hash-verified before execution; a mismatch stops setup. Downstream package verification is not covered by that bootstrap hash.
+4. If account configuration is required, use OpenClaw's onboarding in that distribution. The managed CLI is at `$HOME/.local/share/agent-workspace/openclaw/bin/openclaw`; an existing installation may instead be on PATH. Run the appropriate CLI with `onboard`. Provider credentials belong in OpenClaw, not Foxsocket chat or diagnostics.
+5. Return to Prepare Host. It installs/enables the user gateway service, enables Linux user lingering if needed, and registers a limited-privilege Windows sign-in task. The task keeps the selected Host available independently of the app window.
+6. Select your configured agent and send a test message. A responding gateway alone does not prove that your model works.
 
-**Client:** use an agent running on another computer. The other computer is its Host and must be awake and reachable. You do not need OpenClaw, a Linux environment, or a separate provider account on a Client just to chat with that Host.
+## Background behavior and removal limitation
 
-**Host:** run your own agent on this computer. We will prepare its runtime, connect your chosen AI provider, name the agent, choose access, and verify a reply. Private networking is added afterward if you want access from another device.
+Closing Foxsocket does not stop the independent Host. The current desktop uninstaller does not remove the Host's Windows sign-in task, Linux service, runtime, or user data. Automatic Host removal is unfinished; inspect the exact task and distribution before manual removal. Do not delete unrelated tasks or agent data.
 
-Choose Host to run your own agent here. Choose Client if you already have a Host elsewhere. Do not erase a working setup during troubleshooting.
+## Recovery
 
-## Host, step 1: prepare Windows
+If inspection times out or fails, wait for Linux to finish starting and retry. Foxsocket must not replace an existing runtime merely because a probe fails. Do not repeatedly reinstall to resolve provider-account errors.
 
-Connect to the internet, finish Windows' first-run setup, and complete any already-pending restart. Keep the laptop plugged in during installation. Our app should detect what is installed and explain the next required step.
-
-The current app integration uses OpenClaw in WSL. WSL is Windows' way of running a small Linux environment in the background. The setup screen lists installed Linux environments rather than assuming that everyone already has Ubuntu.
-
-OpenClaw also has a Windows Hub companion that can provision its own WSL environment. Its native and Hub routes need separate compatibility testing with our app before we offer them as supported alternatives. [Official Windows guide](https://docs.openclaw.ai/platforms/windows)
-
-## Host, step 2: prepare the Linux environment
-
-These instructions are for a new WSL Host. Skip installation if the app already detects the supported environment.
-
-1. Right-click Windows Start and choose **Terminal (Admin)**. Approve the Windows permission prompt for the terminal you just opened.
-2. In its PowerShell tab, enter this one command:
-
-   ```powershell
-   wsl --install -d Ubuntu-24.04
-   ```
-
-3. Wait for Windows to finish. If it requests a restart, save your work and restart. Reopen the app afterward; saved setup choices should remain.
-4. Open **Ubuntu 24.04** from Start. Its first launch may take a little time.
-5. If asked, choose a Linux username and password. This is the Linux environment's password. Password characters may not appear while you type; that is normal. Keep it private.
-
-**Checkpoint:** Ubuntu opens to a prompt without an installation error. If Windows reports a virtualization or WSL error, stop at that step and record the exact error code. Do not keep reinstalling OpenClaw. We will resolve Windows' prerequisite first.
-
-## Host, step 3: install OpenClaw
-
-Inside the Ubuntu window, use the installer linked by OpenClaw's official guide:
-
-```bash
-curl -fsSL https://openclaw.ai/install.sh | bash
-```
-
-This downloads and runs OpenClaw's installation script. It can install a supported Node runtime and OpenClaw and start onboarding. Do not paste this command into the Windows PowerShell tab. If a Linux administrator password is requested, enter the password you chose in Ubuntu.
-
-**Checkpoint:** the installer finishes and onboarding appears, or `openclaw --version` displays a version. A download failure is not a reason to change agent settings; check the connection and the reported installer error first. [Official installation guide](https://docs.openclaw.ai/install)
-
-## Host, step 4: connect your AI access
-
-If onboarding did not start, type `openclaw onboard` inside Ubuntu. For our guided Host trial, use **Custom setup** when offered so the person can choose the agent name and access level. Prompts vary by installed version; record that version in the test notes.
-
-1. Choose the provider or existing supported account connection you intend to use. The app must explain the choice and let you change it.
-2. Complete sign-in on the provider's own page, or enter an API key in OpenClaw's private credential prompt when that is the chosen method. Never put passwords, keys, or sign-in codes in the app's support chat or diagnostic report.
-3. Review the provider's access and payment requirements before agreeing. A subscription to a chat app does not automatically establish that this particular connection is supported.
-4. Let onboarding verify the selected connection. If verification fails, stay on this step. Retry after correcting the reported account issue, choose another supported connection, or pause setup.
-
-**Checkpoint:** the selected connection passes its test. Installing OpenClaw alone does not complete this step. Current OpenClaw guidance distinguishes the Quick start defaults from Custom setup's name and access choices. [Onboarding guide](https://docs.openclaw.ai/start/wizard)
-
-## Host, step 5: name the agent and choose access
-
-Choose a name you like. Sparky is the current owner's agent; it is not a required public product name. The product name, device name, and agent name are separate.
-
-Review which folders or tools the agent may use. For the first test, grant only the access needed for conversation and the task being tested. Add other integrations later. Discord, lighting, web-search credentials, and extra skills are not required just to receive the first reply. An app display name is not proof that OpenClaw's agent configuration has been changed; verify the chosen agent in OpenClaw.
-
-## Host, step 6: verify background operation
-
-If onboarding has left a foreground Gateway running in the Ubuntu terminal, press **Ctrl+C** once to stop that foreground instance after setup finishes. Then install the managed background service:
-
-```bash
-openclaw gateway install
-```
-
-Check the result with:
-
-```bash
-openclaw gateway status --json
-```
-
-If the service is installed but stopped, use `openclaw gateway start`, then check again. If service installation reports a systemd problem, preserve the message and follow the Windows/WSL guide with assistance. Do not overwrite Linux configuration blindly.
-
-**Checkpoint:** the managed Gateway is reachable after closing the terminal. After a Windows restart, test again. A successful check before reboot does not prove that the WSL boot chain is configured. The app window's close behavior and the Host's background-service behavior are separate. [Windows background setup](https://docs.openclaw.ai/platforms/windows) · [Gateway commands](https://docs.openclaw.ai/cli/gateway)
-
-## Host, step 7: receive a real reply
-
-OpenClaw's dashboard can be reopened with `openclaw dashboard` inside Ubuntu. Send a short message such as “Reply with hello.” Confirm an actual reply, then test a separate message through our app after selecting the detected environment and agent in Connection setup.
-
-**Checkpoint:** the correct agent replies through our app, the conversation remains after closing and reopening it, and the app remains usable when the Host is offline. A healthy Gateway by itself is not a completed conversation test.
-
-## Client: connect to your Host
-
-The following is a future flow, not a supported test path in 0.6.0-alpha.1. Private app pairing is not implemented.
-
-1. Install and open our app; choose **Client** and give this device a recognizable name.
-2. If Tailscale is missing, use the official Windows installer linked by the app. Complete its installation and any Windows permission prompt.
-3. Open Tailscale and sign in to the same private network as your Host, or accept the owner's invitation to that network. Do not exchange account passwords.
-4. Confirm that Tailscale is connected on both devices. Being on the same network alone does not authorize access to the agent.
-5. In our app, request pairing with the intended Host. On that Host, approve the exact device and requested access. Expired or rejected requests should return to a retryable step.
-6. Select an available agent and send a message. If the Host is asleep, the app should explain that and retain your draft.
-
-[Official Tailscale Windows instructions](https://tailscale.com/docs/install/windows)
-
-## When something goes wrong
-
-Record the current step, app/OpenClaw versions, the error code or a redacted description, and whether a restart happened. Keep credentials and private network details out of the report. The app should retain the current step and offer one specific next action. Do not display “ready” until the relevant live checks pass.
-
-Assistance should be one step at a time: say what to click, describe what should appear, confirm the checkpoint, and only then proceed. If the screen differs from this guide, use the exact installed version and official documentation to resolve the difference.
+Find the app version at the bottom of Settings. Include that version and a redacted error description in a bug report; never share keys, conversations, raw settings, or private paths.
