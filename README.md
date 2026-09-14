@@ -17,7 +17,7 @@ This is an **early Windows alpha** for testers. It is not a finished agent hosti
 
 Release page (notes + checksums): [v0.6.0-alpha.2](https://github.com/Applied-AI-Solutions-hub/foxsocket/releases/tag/v0.6.0-alpha.2)
 
-Optional integrity check: download [`SHA256SUMS.txt`](https://github.com/Applied-AI-Solutions-hub/foxsocket/releases/download/v0.6.0-alpha.2/SHA256SUMS.txt) from the same release.
+Optional integrity check: download [`SHA256SUMS.txt`](https://github.com/Applied-AI-Solutions-hub/foxsocket/releases/download/v0.6.0-alpha.2/SHA256SUMS.txt) from the same release, then run `(Get-FileHash .\Foxsocket.Setup.0.6.0-alpha.2.exe).Hash` in PowerShell and confirm the value matches the hash in that file.
 
 ### Installer notes
 
@@ -61,7 +61,7 @@ More Host detail: [Host implementation status](docs/managed-host.md).
 
 [Open an issue](https://github.com/Applied-AI-Solutions-hub/foxsocket/issues/new) and include:
 
-- App version (`0.6.0-alpha.2` or what About shows)
+- App version (`0.6.0-alpha.2` or what Settings shows)
 - Windows version
 - Host or Client
 - Steps, expected result, actual result

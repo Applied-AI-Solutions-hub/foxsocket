@@ -15,12 +15,18 @@
     "render:maker": "node build/render-maker.cjs",
     "update:local": "powershell -NoProfile -ExecutionPolicy Bypass -File build/update-local.ps1",
     "test:updates": "node --test updates.test.cjs",
-    "test:host": "node --test host-manager.test.cjs"
+    "test:host": "node --test host-manager.test.cjs",
+    "test": "node --test *.test.cjs",
+    "test:build": "node --test build-ui.test.cjs",
+    "test:package": "node --test package.test.cjs"
   },
   "devDependencies": {
-    "electron": "^40.0.0",
+    "@awesome.me/webawesome": "^3.12.0",
+    "animejs": "^4.5.0",
+    "electron": "44.3.0",
     "electron-builder": "^26.0.12",
     "esbuild": "^0.28.2",
+    "motion": "^13.2.0",
     "sharp": "^0.35.4"
   },
   "build": {
@@ -34,15 +40,9 @@
       "docs/fresh-pc-setup.md",
       "preload.js",
       "index.html",
-      "app.js",
-      "style.css",
       "assets/**/*",
       "lighting.js",
-      "polish.css",
-      "finish.css",
-      "finish.js",
       "branding.js",
-      "brand-ui.js",
       "workspace.css",
       "workspace.js",
       "workspace-main.js",
@@ -54,10 +54,18 @@
       "host-ui.js",
       "host-ui.css",
       "build/host-startup.ps1",
-      "starter-agent.json"
+      "starter-agent.json",
+      "workspace-data.js",
+      "json-response.js",
+      "lighting-policy.js",
+      "runtime-install.js",
+      "build/runtime-integrity.json",
+      "!assets/hero.png",
+      "!assets/dashboard-architecture.png"
     ],
     "win": {
       "target": "nsis",
+      "artifactName": "Foxsocket.Setup.${version}.${ext}",
       "signExecutable": false,
       "icon": "assets/icon.ico"
     },
@@ -72,9 +80,10 @@
     }
   },
   "dependencies": {
-    "@awesome.me/webawesome": "^3.12.0",
-    "animejs": "^4.5.0",
-    "motion": "^13.2.0",
     "openrgb-sdk": "^0.6.0"
+  },
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=22.12.0"
   }
 }

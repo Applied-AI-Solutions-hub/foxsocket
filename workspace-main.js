@@ -4,9 +4,11 @@ const crypto = require('node:crypto');
 const path = require('node:path');
 const setup = require('./setup');
 const {clawArgs}=require('./host-manager');
+const {installCommand}=require('./runtime-install');
+const {parseResponse}=require('./json-response');
 const commands = Object.freeze({
   windows: 'wsl --install -d Ubuntu-24.04',
-  runtime: 'curl -fsSL https://openclaw.ai/install.sh | bash',
+  runtime: installCommand(),
   provider: 'openclaw onboard',
   service: 'openclaw gateway install && openclaw gateway start && openclaw gateway status --json'
 });
@@ -20,8 +22,7 @@ module.exports = function register({ getState, persist, isBusy, run }) {
     const inventory = await setup.inspect();
     if (!inventory.wsl?.distributions.some(d => d.name === distro)) throw Error('Choose an installed Linux environment.');
     const raw = await run('wsl.exe', clawArgs(distro, ['agents', 'list', '--json']));
-    const start = raw.indexOf('[');
-    const list = JSON.parse(raw.slice(start));
+    const list = parseResponse(raw, 'array');
     if (!Array.isArray(list)) throw Error('Could not read the agent list.');
     return list.filter(a => typeof a.id === 'string' && /^[\w.-]{1,80}$/.test(a.id)).map(a => ({ id: a.id, name: String(a.identityName || a.name || a.id).slice(0,64) }));
   };

@@ -4,6 +4,9 @@ let calls=0;
 net.fetch=async()=>{calls++;return calls===1?new Response(JSON.stringify([{tag_name:'v0.6.0-alpha.3',assets:[{name:'Setup.exe',state:'uploaded',size:100}]}]),{status:200}):new Response('{}',{status:404});};
 app.getVersion=()=>require('./package.json').version;
 require('./main');
+const {ipcMain}=require('electron');
+for(const action of ['gateway','metrics','setup-check'])ipcMain.removeHandler(action);
+ipcMain.handle('gateway',()=>({ok:false}));ipcMain.handle('metrics',()=>({}));ipcMain.handle('setup-check',()=>({wsl:{distributions:[]},tailscale:{status:'not-installed'}}));
 app.whenReady().then(async()=>{
  try{
  const win=BrowserWindow.getAllWindows()[0];await new Promise(r=>win.webContents.isLoading()?win.webContents.once('did-finish-load',r):r());

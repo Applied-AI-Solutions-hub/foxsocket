@@ -1,0 +1,45 @@
+name: Build test installer
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa
+        with:
+          version: 11.19.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - run: pnpm test:ui
+      - run: pnpm exec electron chat-persist-smoke.cjs
+      - run: pnpm exec electron backup-smoke.cjs
+      - run: pnpm exec electron host-smoke.cjs
+      - run: pnpm exec electron updates-smoke.cjs
+      - run: pnpm exec electron host-lifecycle-smoke.cjs
+      - run: pnpm exec electron host-lifecycle-smoke.cjs --preparing
+      - run: pnpm dist
+      - name: Record exact artifact identity
+        shell: pwsh
+        run: |
+          $assets = @(Get-ChildItem -LiteralPath release -Filter '*.exe')
+          if ($assets.Count -ne 1) { throw 'Expected one installer.' }
+          $asset = $assets[0]
+          $hash = (Get-FileHash -LiteralPath $asset.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  $($asset.Name)" | Set-Content release/SHA256SUMS.txt
+          "$env:GITHUB_SHA" | Set-Content release/SOURCE-COMMIT.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: foxsocket-test-${{ github.sha }}
+          path: |
+            release/*.exe
+            release/SHA256SUMS.txt
+            release/SOURCE-COMMIT.txt
+          retention-days: 14

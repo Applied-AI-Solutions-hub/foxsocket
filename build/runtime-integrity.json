@@ -1,0 +1,7 @@
+{
+  "version": "2026.9.3",
+  "scope": "Bootstrap script only; downstream packages retain upstream trust",
+  "url": "https://openclaw.ai/install-cli.sh",
+  "observedUtc": "2026-09-11T07:48:02.8470897Z",
+  "sha256": "e16d756e3df17fda025437ee3ee4442a0a9d4e445e51b11d49ecee6a6be5bcc1"
+}
