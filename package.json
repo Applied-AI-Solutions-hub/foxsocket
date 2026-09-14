@@ -34,7 +34,6 @@
       "docs/fresh-pc-setup.md",
       "preload.js",
       "index.html",
-      "app.js",
       "style.css",
       "assets/**/*",
       "lighting.js",
