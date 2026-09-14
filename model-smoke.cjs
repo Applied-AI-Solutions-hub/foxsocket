@@ -3,10 +3,12 @@ const fs=require('fs'),path=require('path');
 const profile=path.join(__dirname,'.qa','model-'+Date.now());fs.mkdirSync(profile,{recursive:true});app.setPath('userData',profile);
 require('./main');
 const gaming={cpu:12,cpuName:'Test CPU',memory:20e9,memoryTotal:64*1024**3,gpu:{name:'NVIDIA GeForce RTX 4090',size:24576},disk:{free:500*1024**3},checked:Date.now()};
-for(const a of ['gateway','metrics','setup-check'])ipcMain.removeHandler(a);
+let handoff;
+for(const a of ['gateway','metrics','setup-check','setup-command'])ipcMain.removeHandler(a);
 ipcMain.handle('gateway',()=>({ok:false}));
 ipcMain.handle('metrics',()=>gaming);
-ipcMain.handle('setup-check',()=>({wsl:{distributions:[]},tailscale:{status:'not-installed'}}));
+ipcMain.handle('setup-check',()=>({wsl:{distributions:[{name:'Ubuntu-24.04'}]},tailscale:{status:'not-installed'}}));
+ipcMain.handle('setup-command',(_,choice)=>{handoff=choice;return {copied:true};});
 app.whenReady().then(async()=>{
  const win=BrowserWindow.getAllWindows()[0];if(win.webContents.isLoading())await new Promise(r=>win.webContents.once('did-finish-load',r));
  try{
@@ -28,8 +30,11 @@ app.whenReady().then(async()=>{
    check(st.setup.provider==='openai','Provider choice persisted');
    check($('[data-action=connect-openclaw]'),'Continue-in-OpenClaw handoff is offered');
    check(!$('#content input[type=password]')&&!/api key|paste your key/i.test(text()),'No in-app credential entry');
-   return {opened:true,securityShown:true,cloudChosen:true,providerPersisted:true,handoff:true};
+   $('[data-action=connect-openclaw]').click();await wait(400);
+   check($('#toast').textContent.startsWith('Command copied'),'Handoff copies the command on a fresh install, got toast: '+$('#toast').textContent);
+   return {opened:true,securityShown:true,cloudChosen:true,providerPersisted:true,handoff:true,handoffCopied:true};
   })()`);
+  if(handoff?.step!=='provider'||handoff?.distro!=='Ubuntu-24.04')throw Error('Handoff must pass the installed distro, got '+JSON.stringify(handoff));
   fs.writeFileSync(path.join(__dirname,'.qa','model-results.json'),JSON.stringify(result,null,2));
   fs.writeFileSync(path.join(__dirname,'.qa','model.png'),(await win.webContents.capturePage()).toPNG());
   app.exit(0);
