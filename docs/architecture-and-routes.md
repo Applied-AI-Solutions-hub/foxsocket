@@ -1,6 +1,6 @@
 # Architecture and routes
 
-Scope: public source at main commit `64da418`, reviewed 2026-09-11. This describes product code, not a maintainer's installed machine. The published Windows prerelease is separately versioned; consult its release notes. Open PRs are not installed functionality.
+Scope: public source at main commit `728227a`, reviewed 2026-09-21. This describes product code, not a maintainer's installed machine. The published Windows prerelease is separately versioned; consult its release notes. Open PRs are not installed functionality.
 
 ## Components
 
@@ -13,16 +13,17 @@ Scope: public source at main commit `64da418`, reviewed 2026-09-11. This describ
 | Setup | [setup.js](../setup.js), [starter-agent.json](../starter-agent.json) | Local setup record and clean starter manifest |
 | Release checks | [updates.js](../updates.js), [updates-main.js](../updates-main.js) | GitHub release discovery; does not install updates |
 | Optional lighting | [lighting.js](../lighting.js) | Local OpenRGB integration; hardware support must be checked per device |
+| Harness | [foxsocket-agent.cjs](../foxsocket-agent.cjs), [foxsocket-llm.cjs](../foxsocket-llm.cjs), [foxsocket-providers.cjs](../foxsocket-providers.cjs) | Persona, persistent working-memory graph, provider-agnostic model calls. Called in-process by `main.js` today; see [Gateway daemon](gateway-daemon.md) for the standalone-daemon work in progress |
 
 The desktop renderer is not a public web or remote-control API. Local IPC handlers are implementation interfaces, not network routes. Read the source modules for their current argument contracts rather than using a historical route inventory.
 
 ## Agent conversation
 
-Desktop chat invokes the OpenClaw CLI through WSL, using the selected connection and a saved application session key. The existing agent configuration selects the model and tools; a model observed on one developer's PC is not a product default or hardware requirement.
+As of `728227a`, desktop chat no longer invokes OpenClaw or WSL. `main.js`'s `chat` IPC handler calls `foxsocket-llm.cjs` directly, in-process, against whichever provider is active in `foxsocket-providers.cjs` (a local Ollama model, or a user-supplied ChatGPT/Claude/Grok key). `foxsocket-agent.cjs` supplies the persona (`agent/TYPE.md`, `IDENTITY.md`, `SOUL.md`, `USER.md`, `HEARTBEAT.md`) and the persistent working-memory graph (`agent/GRAPH.json`); the model is expected to emit a `:::foxsocket-graph:::` fence when something should persist, which the harness parses back into the graph.
 
-OpenClaw integrations such as Discord can have separate session histories from the desktop. A shared agent identity does not establish synchronized conversations, equal effective tool availability, or application pairing. Tool discovery, authorization and execution need separate evidence.
+This in-process harness is being pulled out into a standalone daemon (`foxsocket-gateway.cjs`) so it runs independent of the Electron window and is reachable by more than one client over HTTP. See [Gateway daemon](gateway-daemon.md) for what's implemented and what isn't yet.
 
-See [Host status](managed-host.md) and [fresh-PC setup](fresh-pc-setup.md) for implemented boundaries. A clean starter manifest does not provision a working model or copy an owner's personal assistant.
+The paragraphs below (OpenClaw CLI arguments, Discord session identity, WSL tool discovery) describe the Host-management surface — preparing and monitoring an OpenClaw gateway inside WSL as an optional agent backend — not the desktop chat path itself. See [Host status](managed-host.md) and [fresh-PC setup](fresh-pc-setup.md) for that surface's implemented boundaries. A clean starter manifest does not provision a working model or copy an owner's personal assistant.
 
 ## Local data and lifecycle
 

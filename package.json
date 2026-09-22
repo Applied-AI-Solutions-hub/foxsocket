@@ -15,7 +15,8 @@
     "render:maker": "node build/render-maker.cjs",
     "update:local": "powershell -NoProfile -ExecutionPolicy Bypass -File build/update-local.ps1",
     "test:updates": "node --test updates.test.cjs",
-    "test:host": "node --test host-manager.test.cjs"
+    "test:host": "node --test host-manager.test.cjs",
+    "test:gateway": "node --test gateway.test.cjs"
   },
   "devDependencies": {
     "electron": "^40.0.0",
