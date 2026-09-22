@@ -12,7 +12,7 @@ function fixture(changes={}){
   if(args.includes('enable-linger')){flags.linger=true;return ok('');}
   if(args.includes('show'))return ok(`LoadState=${flags.service?'loaded':'not-found'}\nActiveState=${flags.running?'active':'inactive'}\nSubState=${flags.running?'running':'dead'}\nUnitFileState=${flags.enabled?'enabled':'disabled'}\nRestart=${flags.restart?'always':'no'}\nMainPID=${flags.running?'123':'0'}`);
   if(args.includes('health'))return ok(JSON.stringify({ok:flags.reachable,secret:'must-not-leak'}));
-  if(args.includes('doctor')&&args.includes('--json'))return flags.doctorFail?fail():ok(JSON.stringify({ok:flags.doctorOk,findings:flags.doctorFindings,secret:'must-not-leak'}));
+  if(args.includes('doctor')&&args.includes('--json'))return flags.doctorFail?fail():ok(flags.doctorRaw||JSON.stringify({ok:flags.doctorOk,findings:flags.doctorFindings,secret:'must-not-leak'}));
   if(args.includes('doctor')&&args.includes('--fix')){if(flags.failRepair)return fail();flags.repaired=true;flags.doctorOk=true;flags.doctorFindings=[];return ok('');}
   if(args.includes('install')){if(flags.failService)return fail();flags.service=true;return ok('');}
   if(args.includes('enable')){if(flags.failService)return fail();flags.enabled=true;flags.running=true;return ok('');}
@@ -78,6 +78,24 @@ test('a failed runtime download is classified by its real exit code',async()=>{
 test('an unrecognized runtime failure code falls back to the generic message',async()=>{
  const f=fixture({runtime:false,configured:false,service:false,running:false,reachable:false,boot:false,failRuntime:true,runtimeFailCode:1});
  const r=await f.manager.prepare('Ubuntu-24.04');assert.equal(r.issue,'runtime');assert.match(r.error,/could not finish downloading/);
+});
+test('doctor output shape matches a real openclaw doctor --json payload',async()=>{
+ // Structurally mirrors `openclaw doctor --json` captured against a live install
+ // on 2026-09-21 (checksRun/checksSkipped as numbers; findings mixing severities,
+ // with fields like `target` present only on some checks). Values below are
+ // scrubbed placeholders, not the real captured content.
+ const raw=JSON.stringify({
+  ok:false,checksRun:31,checksSkipped:29,
+  findings:[
+   {checkId:'core/doctor/runtime-tool-schemas',severity:'error',message:'Configured MCP server "example" could not expose runtime tools for schema validation.',path:'mcp.servers.example',requirement:'MCP server "example" requires OAuth authorization.',fixHint:'Fix or disable the offending MCP server, then rerun doctor.'},
+   {checkId:'core/doctor/security',severity:'warning',message:'WARNING: openclaw.json contains plaintext secret-bearing config fields.',fixHint:'Paths: models.providers.example.apiKey\nMigrate them to SecretRefs with openclaw secrets configure.'},
+   {checkId:'core/doctor/skill-workshop-tool-policy',severity:'warning',message:'tools.profile: "minimal" does not include "skill_workshop".',path:'tools.profile',target:'main',requirement:'Autonomous Skill Workshop review requires the skill_workshop tool.',fixHint:'Add tools.alsoAllow: ["skill_workshop"].'}
+  ]
+ });
+ const f=fixture({doctorRaw:raw});const r=await f.manager.prepare('Ubuntu-24.04');
+ assert.equal(r.checks.doctor.ok,false);assert.equal(r.checks.doctor.checksRun,31);assert.equal(r.checks.doctor.checksSkipped,29);
+ assert.equal(r.checks.doctor.findings.length,3);assert.equal(r.checks.doctor.findings[2].target,'main');
+ assert.equal(r.phase,'ready'); // advisory findings still allow readiness
 });
 test('systemd not enabled vs. an unsupported kernel produce distinct guidance',async()=>{
  const notEnabled=await fixture({systemd:false,systemdConfigured:false}).manager.prepare('Ubuntu-24.04');

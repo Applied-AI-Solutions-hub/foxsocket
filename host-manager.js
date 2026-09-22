@@ -30,7 +30,7 @@ function createManager({inventory,execute,readBoot,installBoot,onChange=()=>{},n
   let doctor=null;
   if(runtime){
    const doctorResult=await execute('wsl.exe',clawArgs(distro,['doctor','--json']));
-   if(doctorResult.ok){try{const parsed=JSON.parse(doctorResult.output.slice(doctorResult.output.indexOf('{')));doctor={ok:parsed.ok===true,findings:Array.isArray(parsed.findings)?parsed.findings:[]};}catch{/* older CLI or unexpected output — stays advisory */}}
+   if(doctorResult.ok){try{const parsed=JSON.parse(doctorResult.output.slice(doctorResult.output.indexOf('{')));doctor={ok:parsed.ok===true,checksRun:typeof parsed.checksRun==='number'?parsed.checksRun:null,checksSkipped:typeof parsed.checksSkipped==='number'?parsed.checksSkipped:null,findings:Array.isArray(parsed.findings)?parsed.findings:[]};}catch{/* older CLI or unexpected output — stays advisory */}}
   }
   const boot=await readBoot(distro);
   return {distro,runtime,version:runtime?cli.output.match(/\d+\.\d+\.\d+/)?.[0]:null,configured:config.ok,systemd:init.ok&&init.output.trim()==='systemd',systemdConfigured,service:unit.LoadState==='loaded',running:unit.ActiveState==='active'&&unit.SubState==='running',restart:['always','on-failure'].includes(unit.Restart),enabled:unit.UnitFileState==='enabled',linger:linger.ok&&/Linger=yes/.test(linger.output),reachable,doctor,boot,user,pid:Number(unit.MainPID)||null,checkedAt:now()};
