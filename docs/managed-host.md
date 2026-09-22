@@ -12,8 +12,11 @@ The Host page replaces the terminal-command walkthrough with a live control scre
 - Check that the unit is active/enabled, has a restart policy, can run without a terminal, and has a responding gateway. Provider inference and remote pairing are separate checks.
 - Existing agent selection and connection remain available. Tailscale status is shown separately from app pairing.
 - Drafts in this version survive app restarts using local storage.
+- Two-tier diagnosis, split at the point where OpenClaw itself becomes able to run:
+  - **Before OpenClaw can run**, Foxsocket diagnoses it directly, using safe signal it already has rather than a generic failure message: a failed runtime install is classified by curl's own documented exit code (DNS failure, connection blocked, timeout, TLS/certificate problems consistent with a corporate proxy, disk full), and a missing systemd is split into "not enabled in this distro's `/etc/wsl.conf`" (user-fixable) versus "enabled in `wsl.conf` but this WSL kernel doesn't actually support it" (needs `wsl --update`). Still text-only classification — nothing is edited or repaired automatically at this tier.
+  - **Once OpenClaw is installed**, `openclaw doctor --json` runs as part of every check and its findings (gateway, channels, plugins, model routing, config, sandbox) are attached to the checks — advisory only, a finding never blocks a Host from reaching `ready`. A separate `repair(distro)` operation runs `openclaw doctor --fix --non-interactive` and re-verifies afterward; it is never invoked by `prepare()` automatically, only as its own explicit action.
 
-IPC: `host-status` reads the current operation; `host-check(distro)` starts inspection; `host-prepare(distro)` starts preparation; `host-progress` reports safe structured state. Credentials and raw CLI output are not sent to the renderer. The manager serializes operations.
+IPC: `host-status` reads the current operation; `host-check(distro)` starts inspection; `host-prepare(distro)` starts preparation; `host-repair(distro)` runs OpenClaw's own doctor repair and re-verifies; `host-progress` reports safe structured state. Credentials and raw CLI output are not sent to the renderer. The manager serializes all four operations against one another.
 
 ## Public starter decision
 
@@ -33,11 +36,15 @@ The public setup must guide this complete path:
 
 The fresh-PC Linux installation/initialization flow, embedded provider account wizard, starter provisioning, model downloads, remote app pairing, and mobile clients are not implemented by this patch. Existing provider configuration is reused. Missing configuration is an explicit incomplete state, never a green setup result. New provider access may require browser sign-in, a key, a subscription, or usage charges.
 
+The diagnosis and repair logic above (`host-manager.js`, `host-main.js`) is implemented and unit-tested, but **not yet wired into any UI**. There is no renderer panel showing doctor findings or a runtime-failure's classified reason, and no button that calls `host-repair`. It is reachable only from `preload.js`'s allowlist and `ipcMain`, not from anything a tester can click. `openclaw doctor`'s exact `--json` field names beyond `ok`/`findings` are inferred from documentation, not from a real captured payload — verify against actual `openclaw doctor --json` output on a real install before trusting the parsing beyond those two fields.
+
 Startup is configured after Windows sign-in, not before login. The PC must be awake for remote access. Actual Windows reboot and fresh-PC provisioning still need testing. Do not publish this patch as a finished beginner onboarding flow.
 
 ## Validation
 
 Run `node --test host-manager.test.cjs setup.test.cjs updates.test.cjs`, `pnpm test:ui`, `pnpm exec electron host-smoke.cjs`, and `pnpm exec electron updates-smoke.cjs`. Host UI checks cover progress, retry, existing agent selection, honest Tailscale status, and 1440/1000/760 pixel widths.
+
+`host-manager.test.cjs` (15 cases as of this patch) covers the diagnosis/repair logic against a mocked `execute`: doctor findings attach without blocking readiness, `repair()` calls `openclaw doctor --fix --non-interactive` and re-verifies, a failed repair reports cleanly, runtime-install failures are classified by mocked exit codes (6/7/28/35/60/23, plus an unrecognized code falling back to the generic message), and the two systemd sub-cases produce distinct guidance. None of this has run against a real `openclaw doctor` on Windows yet — the mock's `{ok, findings}` shape is inferred from documentation. Verify the real output shape before relying on it further.
 
 Background Windows startup recovery and actual reboot behavior have not passed end-to-end validation. A stopped task was observed during development; this remains a release limitation.
 
