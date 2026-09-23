@@ -2,7 +2,7 @@ name: Windows test installer
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, fix/installer-host-prerequisites]
   workflow_dispatch:
 
 permissions:
