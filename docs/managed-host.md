@@ -4,6 +4,7 @@ The Host page replaces the terminal-command walkthrough with a live control scre
 
 ## Implemented
 
+- Host installation opens a bundled Windows/Ubuntu setup window. It enables WSL with a Windows permission prompt, saves progress through a restart, and installs Ubuntu 24.04 for the original Windows user. A new environment gets a regular `foxsocket` Linux account and systemd automatically; existing environments are preserved. The Host page can reopen this setup.
 - Host navigation, responsive control screen, real prerequisite/service/startup checks, progress and recoverable errors.
 - Hidden execution through WSL `--exec`. OpenClaw arguments stay positional, including chat messages containing shell metacharacters.
 - Reuse an existing configured agent. If the CLI is missing, a supported Linux environment can install pinned OpenClaw 2026.9.3 with the official user-prefix installer.
@@ -31,13 +32,15 @@ The public setup must guide this complete path:
 
 ## Not complete
 
-The fresh-PC Linux installation/initialization flow, embedded provider account wizard, starter provisioning, model downloads, remote app pairing, and mobile clients are not implemented by this patch. Existing provider configuration is reused. Missing configuration is an explicit incomplete state, never a green setup result. New provider access may require browser sign-in, a key, a subscription, or usage charges.
+The embedded OpenClaw provider account wizard, starter provisioning, model downloads, remote app pairing, and mobile clients are not implemented by this patch. Existing provider configuration is reused. Missing configuration is an explicit incomplete state, never a green setup result. New provider access may require browser sign-in, a key, a subscription, or usage charges.
 
 Startup is configured after Windows sign-in, not before login. The PC must be awake for remote access. Actual Windows reboot and fresh-PC provisioning still need testing. Do not publish this patch as a finished beginner onboarding flow.
 
 ## Validation
 
 Run `node --test host-manager.test.cjs setup.test.cjs updates.test.cjs`, `pnpm test:ui`, `pnpm exec electron host-smoke.cjs`, and `pnpm exec electron updates-smoke.cjs`. Host UI checks cover progress, retry, existing agent selection, honest Tailscale status, and 1440/1000/760 pixel widths.
+
+Run `powershell -NoProfile -ExecutionPolicy Bypass -File build/host-setup.test.ps1` for isolated prerequisite orchestration tests. These mock Windows servicing and WSL; they do not replace a fresh Windows VM test covering real UAC, download, reboot/sign-in recovery, default Linux user and systemd. The installer must also be built with `pnpm dist` to validate the NSIS hooks and bundled helper files.
 
 Background Windows startup recovery and actual reboot behavior have not passed end-to-end validation. A stopped task was observed during development; this remains a release limitation.
 

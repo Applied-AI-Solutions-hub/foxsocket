@@ -1,6 +1,6 @@
 # Fresh-PC setup: beginner walkthrough
 
-Prepared September 10, 2026. This guide is bundled with the app so setup help does not depend on having a working agent. Version 0.6.0-alpha.1 includes guided local Host setup. Installation commands run in user-opened terminals, with instructions and checkpoints inside the app. Remote Client pairing is planned and is not implemented in this alpha.
+This guide is bundled with the app so setup help does not depend on having a working agent. Starting with the 0.6.0-alpha.3 build, Host installation includes Windows/Ubuntu preparation with restart recovery. OpenClaw account onboarding remains a separate step. Remote Client pairing is planned and is not implemented in this alpha.
 
 ## First, choose what this computer will do
 
@@ -20,20 +20,13 @@ OpenClaw also has a Windows Hub companion that can provision its own WSL environ
 
 ## Host, step 2: prepare the Linux environment
 
-These instructions are for a new WSL Host. Skip installation if the app already detects the supported environment.
+1. Choose **Host** in the Foxsocket installer. Its setup window checks for existing Linux environments and prepares Windows if needed. If Foxsocket is already installed, choose **Set up Ubuntu** on the Host page.
+2. Approve the Windows permission prompt. Keep the PC online and plugged in while components download.
+3. If setup offers **Restart Windows**, save your work first. Setup reopens after you sign back into the same Windows account; it does not restart without your confirmation.
+4. Setup downloads Ubuntu 24.04, creates a regular `foxsocket` Linux account, enables its service manager, and verifies both. No terminal commands or Linux password prompt are needed. This app-managed account has no password or blanket sudo access.
+5. Choose **Open Foxsocket**, then **Prepare Host**. Existing Linux installations are preserved and can be selected in the app.
 
-1. Right-click Windows Start and choose **Terminal (Admin)**. Approve the Windows permission prompt for the terminal you just opened.
-2. In its PowerShell tab, enter this one command:
-
-   ```powershell
-   wsl --install -d Ubuntu-24.04
-   ```
-
-3. Wait for Windows to finish. If it requests a restart, save your work and restart. Reopen the app afterward; saved setup choices should remain.
-4. Open **Ubuntu 24.04** from Start. Its first launch may take a little time.
-5. If asked, choose a Linux username and password. This is the Linux environment's password. Password characters may not appear while you type; that is normal. Keep it private.
-
-**Checkpoint:** Ubuntu opens to a prompt without an installation error. If Windows reports a virtualization or WSL error, stop at that step and record the exact error code. Do not keep reinstalling OpenClaw. We will resolve Windows' prerequisite first.
+**Checkpoint:** setup reports **Ubuntu is ready**. This verifies Linux, not an AI provider or agent reply. If an operation fails, the same window displays diagnostics and **Try again**. If firmware virtualization is disabled, it must be enabled in the PC's firmware before Windows can run WSL2. **Continue later** retains progress and unfinished setup reopens at next sign-in. No existing distribution is removed and WSL is never shut down globally.
 
 ## Host, step 3: install OpenClaw
 

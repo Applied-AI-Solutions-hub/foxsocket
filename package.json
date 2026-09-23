@@ -1,6 +1,6 @@
 {
   "name": "foxsocket",
-  "version": "0.6.0-alpha.2",
+  "version": "0.6.0-alpha.3",
   "description": "Foxsocket Host for this PC — Sparky, your models, your devices",
   "license": "MIT",
   "author": "Applied AI Solutions",
@@ -11,7 +11,7 @@
     "dist": "node build-ui.mjs && node build/render-maker.cjs && electron-builder --config electron-builder.cjs --win nsis",
     "build:ui": "node build-ui.mjs",
     "test:ui": "node build-ui.mjs && electron workspace-smoke.cjs",
-    "test:setup": "node --test setup.test.cjs",
+    "test:setup": "node --test setup.test.cjs && powershell -NoProfile -ExecutionPolicy Bypass -File build/host-setup.test.ps1",
     "render:maker": "node build/render-maker.cjs",
     "update:local": "powershell -NoProfile -ExecutionPolicy Bypass -File build/update-local.ps1",
     "test:updates": "node --test updates.test.cjs",

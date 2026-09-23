@@ -6,7 +6,7 @@ Open-source personal AI desktop workspace by [Applied AI Solutions](https://appl
 
 This is an **early Windows alpha** for testers. It is not a finished agent hosting platform yet.
 
-> **Set expectations:** installing Foxsocket alone does **not** yet take a fresh PC all the way to a working agent reply. Host readiness checks and connecting an **existing** OpenClaw agent in WSL are in scope; guided Linux setup, provider/model wizard, and automatic starter provisioning are not.
+> **Set expectations:** installing Foxsocket alone does **not** yet take a fresh PC all the way to a working agent reply. The next installer build includes guided Windows/Ubuntu preparation with restart recovery. OpenClaw provider onboarding and automatic starter provisioning remain separate. The download below is the earlier published alpha; the new prerequisite flow requires a build from this revision.
 
 ## Quick start (Windows testers)
 
@@ -46,7 +46,8 @@ Focus on these paths:
 
 ### Not finished yet
 
-- Clean-PC Linux initialization, provider/model account wizard, and automatic starter-agent provisioning
+- Provider/model account wizard and automatic starter-agent provisioning
+- Fresh-PC validation of the new Windows/Ubuntu installer across real permission prompts and reboots
 - End-to-end “fresh PC → first agent reply” with no prior OpenClaw config
 - Remote application pairing, iPhone/iPad clients, and cross-device conversation sync
 - Treating a connected Tailscale network as app pairing (Tailscale is the intended private path; pairing itself is not implemented)

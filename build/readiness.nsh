@@ -31,7 +31,7 @@ Function ChooseRolePage
   ${ElseIf} $SetupRole == "client"
     ${NSD_Check} $ClientChoice
   ${EndIf}
-  ${NSD_CreateLabel} 0 112u 100% 36u "Next checks this PC and explains what is available. OpenClaw, Linux, Tailscale, and AI models are not installed by this check."
+  ${NSD_CreateLabel} 0 112u 100% 36u "Host installation includes guided Windows and Ubuntu setup. Windows may request administrator permission and a restart. Existing Linux environments are preserved."
   Pop $0
   nsDialogs::Show
 FunctionEnd
@@ -89,7 +89,11 @@ Function ReadinessPage
   Pop $0
   nsDialogs::CreateControl EDIT ${WS_VISIBLE}|${WS_CHILD}|${WS_TABSTOP}|${WS_VSCROLL}|${ES_MULTILINE}|${ES_READONLY}|${ES_AUTOVSCROLL} ${WS_EX_CLIENTEDGE} 0 38u 100% 92u "$ReadinessReport"
   Pop $ReadinessText
-  ${NSD_CreateLabel} 0 136u 100% 30u "Back changes the role. Cancel leaves the app uninstalled. Continue installs the app only; prerequisite setup follows separately."
+  ${If} $SetupRole == "host"
+    ${NSD_CreateLabel} 0 136u 100% 30u "After copying Foxsocket, setup prepares Windows and Ubuntu and resumes after a restart. AI account setup follows in the app."
+  ${Else}
+    ${NSD_CreateLabel} 0 136u 100% 30u "Continue installs Foxsocket. Linux is not installed for Client computers."
+  ${EndIf}
   Pop $0
   nsDialogs::Show
 FunctionEnd
@@ -108,6 +112,11 @@ FunctionEnd
     FileOpen $0 "$INSTDIR\resources\installer-role.json" w
     FileWrite $0 '{"role":"$SetupRole"}'
     FileClose $0
+  ${EndIf}
+  ${If} $SetupRole == "host"
+    ; Per-user launcher: only the helper's fixed Windows prerequisite command
+    ; requests elevation. Ubuntu must register for the original Windows user.
+    ${StdUtils.ExecShellAsUser} $0 "$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" "open" '-NoProfile -STA -WindowStyle Hidden -ExecutionPolicy Bypass -File "$INSTDIR\resources\host-setup.ps1" -AppPath "$INSTDIR\${APP_EXECUTABLE_FILENAME}"'
   ${EndIf}
 !macroend
 !endif
