@@ -38,10 +38,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Check normal chat request path
         run: pnpm exec electron local-chat-smoke.cjs
+      - name: Check isolated development launch
+        run: pnpm exec electron build/dev-main.cjs --fresh --dev-smoke
       - name: Check signature rejection gate
         run: ./build/verify-signature.test.ps1
       - name: Build Windows installer
-        run: pnpm dist
+        run: pnpm dist:dev
       - name: Check installer registration handling
         shell: pwsh
         run: |
@@ -51,5 +53,32 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Explain validation result
         run: |
-          "Packaging checks passed. This PR build is unsigned and is not published for installation." >> $env:GITHUB_STEP_SUMMARY
-          "A signed installer requires the protected Windows signed installer workflow. See docs/windows-signing.md." >> $env:GITHUB_STEP_SUMMARY
+          "Unsigned development installer only. Use a development PC configured by its owner to allow unsigned apps." >> $env:GITHUB_STEP_SUMMARY
+          "This does not establish acceptance on a PC with Smart App Control enforced." >> $env:GITHUB_STEP_SUMMARY
+      - name: Prepare development handoff
+        env:
+          TEST_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          New-Item -ItemType Directory -Path dev-installer | Out-Null
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $installer = Get-Item -LiteralPath "release/Foxsocket Setup $version.exe"
+          Copy-Item -LiteralPath $installer.FullName -Destination dev-installer
+          $digest = (Get-FileHash -LiteralPath $installer.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$digest  $($installer.Name)" | Set-Content dev-installer/SHA256SUMS.txt
+          @{
+            version = $version
+            tested_head_sha = $env:TEST_HEAD_SHA
+            checkout_sha = (git rev-parse HEAD)
+            signature_status = (Get-AuthenticodeSignature -LiteralPath $installer.FullName).Status.ToString()
+            purpose = 'Unsigned development build; requires an owner-configured development PC'
+            run_url = "https://github.com/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
+          } | ConvertTo-Json | Set-Content dev-installer/BUILD-INFO.json
+          Copy-Item LENOVO-START-HERE.md dev-installer
+          Copy-Item docs/development.md dev-installer/DEVELOPMENT.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Foxsocket-Windows-UNSIGNED-DEVELOPMENT
+          path: dev-installer/*
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0

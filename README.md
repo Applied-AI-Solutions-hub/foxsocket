@@ -10,6 +10,8 @@ This is an **early Windows alpha** for testers. It is not a finished agent hosti
 
 ## Quick start (Windows testers)
 
+**Developing Foxsocket now:** the Lenovo is an owner-selected development PC. Use the current PR's **Foxsocket-Windows-UNSIGNED-DEVELOPMENT** artifact, or run `pnpm dev:fresh` from source. [Development setup and Windows policy instructions](docs/development.md). Free public signing is a separate task and does not prevent development.
+
 1. Download the installer: [**Foxsocket.Setup.0.6.0-alpha.2.exe**](https://github.com/Applied-AI-Solutions-hub/foxsocket/releases/download/v0.6.0-alpha.2/Foxsocket.Setup.0.6.0-alpha.2.exe)
 2. Run it, pick an install location, then launch Foxsocket.
 3. Choose **Host** to assess this PC for running an agent (or **Client** if you are joining another Host).

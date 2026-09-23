@@ -1,8 +1,8 @@
 # Shared Lenovo handoff — alpha.6
 
-**Free services only by default.** We are pursuing SignPath Foundation; application, approval, and integration are pending. Azure is no longer required or configured by this branch. The signed-installer workflow currently reports this blocker and publishes nothing.
+**The owner has chosen to use Lenovo as a development PC.** Continue development with the **Foxsocket-Windows-UNSIGNED-DEVELOPMENT** CI artifact or `pnpm dev:fresh`. See [development setup](docs/development.md) (DEVELOPMENT.md in the artifact) for the explicit owner-controlled Windows setting and commands. No signing account is needed for development.
 
-**STOP: the previous alpha.6 artifact is unsigned and was blocked by Windows Application Control before launch. Its functional fixes have not been tested on Lenovo.** Read [PR #33](https://github.com/Applied-AI-Solutions-hub/foxsocket/pull/33), including the latest test comments. Wait for a new artifact from **Windows signed installer**, with valid signature records in BUILD-INFO.json. Ordinary PR checks no longer publish installers. [Signing setup and current blocker](docs/windows-signing.md).
+The previous alpha.6 artifact was blocked by Windows Application Control. That does not halt development: use the current unsigned development artifact on the owner-configured development PC. Read [PR #33](https://github.com/Applied-AI-Solutions-hub/foxsocket/pull/33) and match the commit/checksum, not just alpha.6. Free public signing remains separate and pending.
 
 ## Changes from the alpha.5 report
 
@@ -13,7 +13,7 @@
 
 ## Test the exact installer
 
-Once a signed artifact is available, extract the ZIP, verify SHA256SUMS.txt and the version/head/signature records in BUILD-INFO.json. Check that Windows shows a valid expected publisher signature, then launch from Explorer with protection still enabled. Do not retry the blocked unsigned alpha.6 artifact or substitute the older public release.
+Extract the current development artifact, verify SHA256SUMS.txt and the version/head in BUILD-INFO.json, and launch from Explorer after the owner has configured Windows for development. Expect the development installer to be unsigned. Record the Windows policy state with the results. Do not substitute the older public release.
 
 The user requires a clean install for each Lenovo iteration. The previous cleanup was incomplete: deletion of leftover model/cache backups was denied by the agent's execution policy. Resolve and document the actual baseline before testing; do not call that state pristine or silently substitute an upgrade. Preserve unrelated user data and working Sparky. Do not manually install a backend to hide a failure.
 
@@ -25,7 +25,7 @@ The user requires a clean install for each Lenovo iteration. The previous cleanu
 6. Close and reopen the app. Repeat in a new chat, then confirm the previous conversation remains accessible.
 7. After saving other work, restart Windows, reopen Foxsocket, and repeat a normal chat request. This Windows restart test was not completed on alpha.5.
 8. Check sidebar navigation, Models, Resume setup, the details toggle, resizing, and the absence of sliding animations. If a download fails, verify Resume setup and retained errors; do not claim interrupted-download recovery without observing it.
-9. Verify the installed uninstaller's signature, uninstall Foxsocket, and record whether Application Control allowed it. Record any additional blocked executable or script, including optional Ubuntu setup, without changing Windows protection.
+9. Uninstall Foxsocket and record the result and signature status. Record any additional blocked executable or script, including optional Ubuntu setup. Successful tests with Smart App Control off do not count as protected consumer-PC acceptance.
 
 ## Report on PR #33
 

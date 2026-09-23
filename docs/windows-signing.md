@@ -19,8 +19,10 @@ Start from the Apply link on the Foundation website. Account setup, terms accept
 
 ## Current build behavior
 
-- PR CI still compiles with explicit FOXSOCKET_UNSIGNED_VALIDATION=1 and uploads no installer.
-- Distribution packaging fails with a clear pending-free-signing message. Old Azure environment settings cannot silently activate a paid provider.
+Development continues independently: use `pnpm dev:fresh` or `pnpm dist:dev`. The owner has selected the Lenovo as a development PC. See [development setup](development.md).
+
+- PR CI compiles with explicit FOXSOCKET_UNSIGNED_VALIDATION=1 and publishes a clearly labelled UNSIGNED-DEVELOPMENT artifact for owner-configured development PCs.
+- The trusted-distribution command `pnpm dist` fails with a pending-free-signing message. The explicit `pnpm dist:dev` command works without signing. Old Azure environment settings cannot silently activate a paid provider.
 - The manual Windows signed installer workflow is a status-only failure until the free integration is approved and implemented. It contains no signing credentials or upload step.
 - Signature verification scripts and the NSIS embedded-uninstaller check remain available for the future integration; they do not mean an installer has been signed.
 - After enrollment, integrate the approved SignPath artifact policy and protected release approval, preserve upstream signatures, check each executable against its expected signer, and hash the final signed installer. Record version, commit, signatures, and hashes in BUILD-INFO.json.
