@@ -62,7 +62,8 @@
       "local-model.cjs",
       "local-runtime.cjs",
       "local-main.cjs",
-      "local-ui.js"
+      "local-ui.js",
+      "quiet-workspace.css"
     ],
     "win": {
       "target": "nsis",
