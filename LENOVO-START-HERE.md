@@ -1,6 +1,6 @@
 # Shared Lenovo handoff — alpha.6
 
-Read [PR #33](https://github.com/Applied-AI-Solutions-hub/foxsocket/pull/33), including the latest test comments, before testing. Use its matching **0.6.0-alpha.6** artifact from `design/quiet-workspace`. Main/public releases may still show alpha.2. Alpha.5 is the previous tested build.
+**STOP: the previous alpha.6 artifact is unsigned and was blocked by Windows Application Control before launch. Its functional fixes have not been tested on Lenovo.** Read [PR #33](https://github.com/Applied-AI-Solutions-hub/foxsocket/pull/33), including the latest test comments. Wait for a new artifact from **Windows signed installer**, with valid signature records in BUILD-INFO.json. Ordinary PR checks no longer publish installers. [Signing setup and current blocker](docs/windows-signing.md).
 
 ## Changes from the alpha.5 report
 
@@ -11,9 +11,9 @@ Read [PR #33](https://github.com/Applied-AI-Solutions-hub/foxsocket/pull/33), in
 
 ## Test the exact installer
 
-Download the artifact linked in PR #33, extract the ZIP, verify SHA256SUMS.txt and the version/head in BUILD-INFO.json, and launch the installer from Explorer. Do not use an older public release or launch from Codex's developer shell.
+Once a signed artifact is available, extract the ZIP, verify SHA256SUMS.txt and the version/head/signature records in BUILD-INFO.json. Check that Windows shows a valid expected publisher signature, then launch from Explorer with protection still enabled. Do not retry the blocked unsigned alpha.6 artifact or substitute the older public release.
 
-Preserve existing installations, user data, model caches, and working Sparky. Record the actual baseline. A cleaned existing machine is not a pristine Windows profile. Do not manually install a backend to hide a failure.
+The user requires a clean install for each Lenovo iteration. The previous cleanup was incomplete: deletion of leftover model/cache backups was denied by the agent's execution policy. Resolve and document the actual baseline before testing; do not call that state pristine or silently substitute an upgrade. Preserve unrelated user data and working Sparky. Do not manually install a backend to hide a failure.
 
 1. Record the detected installation and final path. A removed installation must not produce a misleading legacy upgrade claim. An actual legacy installation may retain its existing folder without appending another Foxsocket folder. Fresh Windows-profile installation and legacy upgrade both need acceptance evidence; do not erase data merely to obtain it.
 2. Open Host → Resume setup. Existing model choices are retained. Select **Recommended · Llama 3.2 3B** (about 2 GB download) and run setup. Record the exact selected model.
@@ -23,6 +23,7 @@ Preserve existing installations, user data, model caches, and working Sparky. Re
 6. Close and reopen the app. Repeat in a new chat, then confirm the previous conversation remains accessible.
 7. After saving other work, restart Windows, reopen Foxsocket, and repeat a normal chat request. This Windows restart test was not completed on alpha.5.
 8. Check sidebar navigation, Models, Resume setup, the details toggle, resizing, and the absence of sliding animations. If a download fails, verify Resume setup and retained errors; do not claim interrupted-download recovery without observing it.
+9. Verify the installed uninstaller's signature, uninstall Foxsocket, and record whether Application Control allowed it. Record any additional blocked executable or script, including optional Ubuntu setup, without changing Windows protection.
 
 ## Report on PR #33
 

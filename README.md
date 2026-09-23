@@ -6,7 +6,7 @@ Open-source personal AI desktop workspace by [Applied AI Solutions](https://appl
 
 This is an **early Windows alpha** for testers. It is not a finished agent hosting platform yet.
 
-> **Current test build: alpha.6.** [PR #33](https://github.com/Applied-AI-Solutions-hub/foxsocket/pull/33) contains the matching installer download and shared Lenovo test instructions. Choose Host, then **Set up local model**. Foxsocket installs Ollama, downloads your model with progress, and checks basic arithmetic and instruction following using the same prompt as local chat. Local chat runs directly on Windows; Ubuntu/OpenClaw is an optional separate integration. The release link below remains the older public alpha.2.
+> **Lenovo testing blocked: the alpha.6 installer is unsigned and Windows Application Control rejected it.** Do not retry that artifact. [PR #33](https://github.com/Applied-AI-Solutions-hub/foxsocket/pull/33) tracks the fixes and [shared test instructions](LENOVO-START-HERE.md). New distributable builds require verified publisher signatures; [one-time signing setup](docs/windows-signing.md) is still pending. The public alpha.2 release below is historical and does not fix this policy block.
 
 ## Quick start (Windows testers)
 

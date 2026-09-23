@@ -68,7 +68,8 @@
     ],
     "win": {
       "target": "nsis",
-      "signExecutable": false,
+      "forceCodeSigning": true,
+      "signExts": [".exe", ".dll", ".node", ".ps1"],
       "icon": "assets/icon.ico"
     },
     "nsis": {

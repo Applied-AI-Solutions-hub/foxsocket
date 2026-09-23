@@ -1,9 +1,8 @@
-name: Windows test installer
+name: Windows PR validation
 
 on:
   pull_request:
     branches: [main, fix/installer-host-prerequisites]
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -16,6 +15,8 @@ jobs:
   installer:
     runs-on: windows-latest
     timeout-minutes: 25
+    env:
+      FOXSOCKET_UNSIGNED_VALIDATION: '1'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -29,7 +30,7 @@ jobs:
         run: node node_modules/electron/install.js
       - name: Check Host setup
         run: |
-          node --test host-manager.test.cjs setup.test.cjs updates.test.cjs local-model.test.cjs local-runtime.test.cjs local-chat.test.cjs
+          node --test build/windows-signing.test.cjs host-manager.test.cjs setup.test.cjs updates.test.cjs local-model.test.cjs local-runtime.test.cjs local-chat.test.cjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           powershell -NoProfile -ExecutionPolicy Bypass -File build/host-setup.test.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -37,6 +38,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Check normal chat request path
         run: pnpm exec electron local-chat-smoke.cjs
+      - name: Check signature rejection gate
+        run: ./build/verify-signature.test.ps1
       - name: Build Windows installer
         run: pnpm dist
       - name: Check installer registration handling
@@ -46,37 +49,7 @@ jobs:
           if (-not $compiler) { throw 'NSIS compiler was not found after packaging' }
           powershell -NoProfile -ExecutionPolicy Bypass -File build/install-identity.test.ps1 -MakeNsis $compiler.FullName
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Prepare handoff files
-        shell: pwsh
-        env:
-          TEST_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Explain validation result
         run: |
-          New-Item -ItemType Directory -Path test-installer | Out-Null
-          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
-          $installer = Get-Item -LiteralPath "release/Foxsocket Setup $version.exe"
-          Copy-Item -LiteralPath $installer.FullName -Destination test-installer
-          $digest = (Get-FileHash -LiteralPath $installer.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
-          "$digest  $($installer.Name)" | Set-Content test-installer/SHA256SUMS.txt
-          @{
-            version = $version
-            tested_head_sha = $env:TEST_HEAD_SHA
-            checkout_sha = (git rev-parse HEAD)
-            run_url = "https://github.com/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
-          } | ConvertTo-Json | Set-Content test-installer/BUILD-INFO.json
-          Copy-Item LENOVO-START-HERE.md test-installer
-      - name: Upload the installer and test instructions
-        id: upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: Foxsocket-Windows-test-installer
-          path: test-installer/*
-          if-no-files-found: error
-          retention-days: 30
-          compression-level: 0
-      - name: Show download link
-        env:
-          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
-        run: |
-          "## Lenovo test installer" >> $env:GITHUB_STEP_SUMMARY
-          "[Download installer, checksum, and shared instructions]($env:ARTIFACT_URL)" >> $env:GITHUB_STEP_SUMMARY
-          "This is a test build. Verify local Ollama installation, a selected-model reply, and recovery after restarting the Lenovo." >> $env:GITHUB_STEP_SUMMARY
+          "Packaging checks passed. This PR build is unsigned and is not published for installation." >> $env:GITHUB_STEP_SUMMARY
+          "A signed installer requires the protected Windows signed installer workflow. See docs/windows-signing.md." >> $env:GITHUB_STEP_SUMMARY
