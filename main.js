@@ -1,5 +1,6 @@
 const {app,BrowserWindow,ipcMain,Tray,Menu,shell,dialog}=require('electron');
 const fs=require('fs'),path=require('path'),os=require('os'),crypto=require('crypto');
+if (!app.isPackaged && process.argv.includes('--foxsocket-dev')) require('./dev-main.cjs');
 const {execFile}=require('child_process');
 let win,tray,quitting=false,busy=false; let state;
 const modes=['Focus','Gaming','Relax','Away'];

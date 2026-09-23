@@ -6,8 +6,8 @@
   "author": "Applied AI Solutions",
   "main": "main.js",
   "scripts": {
-    "dev": "node build-ui.mjs && electron build/dev-main.cjs",
-    "dev:fresh": "node build-ui.mjs && electron build/dev-main.cjs --fresh",
+    "dev": "node build-ui.mjs && electron . --foxsocket-dev",
+    "dev:fresh": "node build-ui.mjs && electron . --foxsocket-dev --fresh",
     "dist:dev": "node build/dev-build.cjs",
     "start": "node build-ui.mjs && electron .",
     "package": "node build-ui.mjs && electron-builder --config electron-builder.cjs --win dir",

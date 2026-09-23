@@ -39,7 +39,7 @@ jobs:
       - name: Check normal chat request path
         run: pnpm exec electron local-chat-smoke.cjs
       - name: Check isolated development launch
-        run: pnpm exec electron build/dev-main.cjs --fresh --dev-smoke
+        run: pnpm exec electron . --foxsocket-dev --fresh --dev-smoke
       - name: Check signature rejection gate
         run: ./build/verify-signature.test.ps1
       - name: Build Windows installer
