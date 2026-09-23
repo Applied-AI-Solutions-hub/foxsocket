@@ -2,15 +2,11 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const signing = require('./windows-signing.cjs');
 
-test('missing or partial publisher configuration cannot produce a distributable build', () => {
-  assert.throws(() => signing({}), /Trusted Windows signing is not configured/);
-  assert.throws(() => signing({ WINDOWS_SIGNING_PUBLISHER: 'Example' }), /AZURE_SIGNING_ENDPOINT/);
+test('distribution remains blocked until free signing is integrated', () => {
+  assert.throws(() => signing({}), /pending SignPath Foundation approval and integration/);
 });
-test('configured distribution requires executable signing', () => {
-  const config = signing({ WINDOWS_SIGNING_PUBLISHER: 'Example', AZURE_SIGNING_ENDPOINT: 'https://eus.codesigning.azure.net/', AZURE_SIGNING_PROFILE: 'public-trust', AZURE_SIGNING_ACCOUNT: 'example' });
-  assert.equal(config.forceCodeSigning, true);
-  assert.equal(config.signExecutable, true);
-  assert.equal(config.azureSignOptions.publisherName, 'Example');
+test('legacy Azure configuration cannot silently select a paid service', () => {
+  assert.throws(() => signing({ WINDOWS_SIGNING_PUBLISHER: 'Example', AZURE_SIGNING_ENDPOINT: 'https://eus.codesigning.azure.net/', AZURE_SIGNING_PROFILE: 'public-trust', AZURE_SIGNING_ACCOUNT: 'example' }), /Free Windows signing is pending/);
 });
 test('unsigned validation cannot be enabled in a dispatched CI release', () => {
   assert.throws(() => signing({ FOXSOCKET_UNSIGNED_VALIDATION: '1', GITHUB_ACTIONS: 'true', GITHUB_EVENT_NAME: 'workflow_dispatch' }), /only permitted/);

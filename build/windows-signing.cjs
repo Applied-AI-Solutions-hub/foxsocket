@@ -6,19 +6,7 @@ module.exports = function windowsSigning(env) {
     }
     return { forceCodeSigning: false, signExecutable: false };
   }
-  const fields = {
-    publisherName: 'WINDOWS_SIGNING_PUBLISHER',
-    endpoint: 'AZURE_SIGNING_ENDPOINT',
-    certificateProfileName: 'AZURE_SIGNING_PROFILE',
-    codeSigningAccountName: 'AZURE_SIGNING_ACCOUNT',
-  };
-  const missing = Object.values(fields).filter(name => !env[name]?.trim());
-  if (missing.length) {
-    throw new Error(`Trusted Windows signing is not configured (${missing.join(', ')}). See docs/windows-signing.md. No distributable installer will be built.`);
-  }
-  return {
-    forceCodeSigning: true,
-    signExecutable: true,
-    azureSignOptions: Object.fromEntries(Object.entries(fields).map(([key, name]) => [key, env[name].trim()])),
-  };
+  // Free signing is the chosen route. Do not silently fall back to a paid provider.
+  // SignPath enrollment and artifact-policy approval must precede integration.
+  throw new Error('Free Windows signing is pending SignPath Foundation approval and integration. See docs/windows-signing.md. No distributable installer will be built.');
 };

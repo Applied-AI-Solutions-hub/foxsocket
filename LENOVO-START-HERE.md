@@ -1,5 +1,7 @@
 # Shared Lenovo handoff — alpha.6
 
+**Free services only by default.** We are pursuing SignPath Foundation; application, approval, and integration are pending. Azure is no longer required or configured by this branch. The signed-installer workflow currently reports this blocker and publishes nothing.
+
 **STOP: the previous alpha.6 artifact is unsigned and was blocked by Windows Application Control before launch. Its functional fixes have not been tested on Lenovo.** Read [PR #33](https://github.com/Applied-AI-Solutions-hub/foxsocket/pull/33), including the latest test comments. Wait for a new artifact from **Windows signed installer**, with valid signature records in BUILD-INFO.json. Ordinary PR checks no longer publish installers. [Signing setup and current blocker](docs/windows-signing.md).
 
 ## Changes from the alpha.5 report
