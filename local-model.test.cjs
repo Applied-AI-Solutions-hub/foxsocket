@@ -7,11 +7,11 @@ test('a reachable Ollama server without the selected model is never ready',async
  await assert.rejects(api.verify(DEFAULT_MODEL),/not downloaded/);assert.equal(generated,false);
 });
 test('verification requires a finished visible reply from the exact selected local model',async()=>{
- const calls=[];let reply={model:DEFAULT_MODEL,done:true,message:{content:'hello'}};
- const api=createLocalApi({fetchImpl:async(url,options)=>{calls.push([url,options]);if(url.endsWith('/api/tags'))return response({models:[{name:DEFAULT_MODEL}]});if(url.endsWith('/api/show'))return response({});return response(reply);}});
- assert.equal((await api.verify(DEFAULT_MODEL)).reply,'hello');
+ const calls=[];let reply=null;
+ const api=createLocalApi({fetchImpl:async(url,options)=>{calls.push([url,options]);if(url.endsWith('/api/tags'))return response({models:[{name:DEFAULT_MODEL}]});if(url.endsWith('/api/show'))return response({});return response(reply||{model:DEFAULT_MODEL,done:true,message:{content:JSON.parse(options.body).messages.at(-1).content.includes('7 plus 5')?'12':'blue'}});}});
+ assert.equal((await api.verify(DEFAULT_MODEL)).checks.length,2);
  assert.equal(JSON.parse(calls.at(-1)[1].body).model,DEFAULT_MODEL);assert.ok(calls.every(([,opts])=>opts.signal));
- for(const value of [{...reply,done:false},{...reply,message:{content:''}},{...reply,model:'wrong:1b'}]){reply=value;await assert.rejects(api.verify(DEFAULT_MODEL));}
+ for(const value of [{model:DEFAULT_MODEL,done:false,message:{content:'12'}},{model:DEFAULT_MODEL,done:true,message:{content:''}},{model:'wrong:1b',done:true,message:{content:'12'}},{model:DEFAULT_MODEL,done:true,message:{content:'I have access to device notes about Applied.'}}]){reply=value;await assert.rejects(api.verify(DEFAULT_MODEL));}
 });
 test('cloud aliases are rejected before generation',async()=>{
  let calls=0;const api=createLocalApi({fetchImpl:async url=>{calls++;return response(url.endsWith('/api/tags')?{models:[{name:DEFAULT_MODEL}]}:{remote_host:'https://cloud.example'});}});
@@ -35,7 +35,7 @@ function fixture(saved=null){
 test('fresh setup installs, starts, downloads and verifies in order; concurrent clicks coalesce',async()=>{
  const f=fixture();const first=f.manager.prepare(DEFAULT_MODEL);assert.equal(first,f.manager.prepare(DEFAULT_MODEL));await first;
  assert.deepEqual(f.calls,['find','install','start','pull','verify']);assert.equal(f.manager.get().verified,true);assert.equal((await f.manager.status(DEFAULT_MODEL)).ok,true);
- assert.ok(f.updates.some(s=>s.total===20&&s.completed===10));assert.equal((await f.manager.status('llama3.2:3b')).ok,false);
+ assert.ok(f.updates.some(s=>s.total===20&&s.completed===10));assert.equal((await f.manager.status('different-model:latest')).ok,false);
  f.setOnline(false);assert.equal((await f.manager.status(DEFAULT_MODEL)).ok,false);f.setOnline(true);assert.equal((await f.manager.status(DEFAULT_MODEL)).ok,false);
 });
 test('download failures and interrupted sessions retain the model and last result',async()=>{

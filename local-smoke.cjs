@@ -4,7 +4,7 @@ net.fetch=async()=>{throw Error('Offline update fixture');};
 let running=false,installed=false,attempts=0,verified=0,installs=0;
 require('./local-model.cjs').createLocalApi=()=>({
  reachable:async()=>running,installed:async()=>installed,
- pull:async(model,progress)=>{attempts++;progress({message:'Downloading model layer',total:100,completed:50});await new Promise(r=>setTimeout(r,250));if(attempts===1)throw Error('Test download interrupted');installed=true;},
+ pull:async(model,progress)=>{attempts++;progress({message:'Downloading model layer',total:100,completed:50});await new Promise(r=>setTimeout(r,1500));if(attempts===1)throw Error('Test download interrupted');installed=true;},
  verify:async model=>{verified++;return {ok:true,model,reply:'hello from '+model};}
 });
 require('./local-runtime.cjs').createWindowsRuntime=()=>({find:async()=>running?'ollama.exe':null,install:async()=>{installs++;},start:async()=>{running=true;}});
@@ -19,11 +19,11 @@ app.whenReady().then(async()=>{
    const $=s=>document.querySelector(s),wait=ms=>new Promise(r=>setTimeout(r,ms)),check=(v,m)=>{if(!v)throw Error(m)};
    $('[data-role=host]').click();await wait(100);check($('#local-model'),'Local model first');check(!$('#distro'),'No Ubuntu prerequisite gate');
    $('#local-model').value='llama3.2:3b';$('#local-model').dispatchEvent(new Event('change',{bubbles:true}));
-   $('[data-action=prepare-local]').click();await wait(100);check($('progress').value===50,'Real download progress');check($('[data-action=prepare-local]').disabled,'Duplicate setup blocked');await wait(250);
+   $('[data-action=prepare-local]').click();for(let n=0;n<20&&$('progress')?.value!==50;n++)await wait(50);check($('progress')?.value===50,'Real download progress');check($('[data-action=prepare-local]').disabled,'Duplicate setup blocked');await wait(1700);
    check($('#content').textContent.includes('Test download interrupted'),'Failure stays visible');
    $('[data-page=devices]').click();check($('#content').textContent.includes('Test download interrupted'),'This PC retains failure');
    $('#content [data-page=setup]').click();check($('#local-model').value==='llama3.2:3b','Model survives navigation');
-   $('[data-action=prepare-local]').click();await wait(400);check($('#content').textContent.includes('Your local model is ready'),'Reply verified');check($('#content').textContent.includes('hello from llama3.2:3b'),'Exact model reply shown');
+   $('[data-action=prepare-local]').click();for(let n=0;n<60&&!$('#content').textContent.includes('Your local model is ready');n++)await wait(50);check($('#content').textContent.includes('Your local model is ready'),'Reply verified');check($('#content').textContent.includes('hello from llama3.2:3b'),'Exact model reply shown');
    const cfg=await desktop.invoke('providers-get');check(cfg.active==='local'&&cfg.model==='llama3.2:3b','Chat uses verified model');
    check((await desktop.invoke('gateway')).ok,'Readiness matches verified model');
    return {localFirst:true,realProgress:true,preservedError:true,resumeNavigation:true,modelSelection:true,verifiedReply:true};

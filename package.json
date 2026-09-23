@@ -1,6 +1,6 @@
 {
   "name": "foxsocket",
-  "version": "0.6.0-alpha.5",
+  "version": "0.6.0-alpha.6",
   "description": "Foxsocket Host for this PC — Sparky, your models, your devices",
   "license": "MIT",
   "author": "Applied AI Solutions",
@@ -63,7 +63,8 @@
       "local-runtime.cjs",
       "local-main.cjs",
       "local-ui.js",
-      "quiet-workspace.css"
+      "quiet-workspace.css",
+      "local-chat.cjs"
     ],
     "win": {
       "target": "nsis",
@@ -73,7 +74,7 @@
     "nsis": {
       "oneClick": false,
       "perMachine": false,
-      "allowToChangeInstallationDirectory": true,
+      "allowToChangeInstallationDirectory": false,
       "createDesktopShortcut": true
     },
     "directories": {

@@ -1,8 +1,8 @@
 'use strict';
 const BASE = 'http://127.0.0.1:11434';
 const MODELS = Object.freeze([
-  {id:'llama3.2:1b',label:'Small · Llama 3.2 1B',download:'About 1.3 GB',memory:'Start here on a laptop; quality is limited.'},
-  {id:'llama3.2:3b',label:'Balanced · Llama 3.2 3B',download:'About 2 GB',memory:'Uses more memory; choose after the small model works.'},
+  {id:'llama3.2:3b',label:'Recommended · Llama 3.2 3B',download:'About 2 GB',memory:'Passed basic chat checks in our test. More memory than 1B; performance still depends on this PC.'},
+  {id:'llama3.2:1b',label:'Small · Llama 3.2 1B (limited quality)',download:'About 1.3 GB',memory:'Lower memory use, but failed basic instruction checks in our test. Not recommended for everyday chat.'},
 ]);
 const DEFAULT_MODEL = MODELS[0].id;
 const normalized = value => value.includes(':') ? value : value + ':latest';
@@ -27,11 +27,16 @@ function createLocalApi({fetchImpl=fetch}={}) {
     if(!await installed(model))throw Error('The selected model is not downloaded. Choose Set up local model.');
     const info=await (await request('/api/show',{model})).json();
     if(info.remote_host||info.remote_model)throw Error('This model uses a remote server. Choose an on-device model.');
-    const data=await (await request('/api/chat',{model,messages:[{role:'user',content:'Reply with the word hello.'}],stream:false,options:{num_predict:32,temperature:0}},180000)).json();
-    const reply=String(data.message?.content||'').replace(/<think>[\s\S]*?<\/think>/gi,'').trim();
-    if(data.done!==true||!reply)throw Error('The selected model did not finish a text reply. Try a smaller model or retry.');
-    if(typeof data.model!=='string'||normalized(data.model)!==normalized(model))throw Error('Ollama replied using a different model. Select it explicitly and retry.');
-    return {ok:true,providerId:'local',model,reply:reply.slice(0,500)};
+    const checks=[];
+    for(const check of require('./local-chat.cjs').CHECKS) {
+      const data=await (await request('/api/chat',{model,messages:require('./local-chat.cjs').messages([{role:'user',content:check.prompt}]),stream:false,think:false,options:{num_predict:128,temperature:0.4}},180000)).json();
+      const reply=String(data.message?.content||'').replace(/<think>[\s\S]*?<\/think>/gi,'').trim();
+      if(data.done!==true||!reply)throw Error('The selected model did not finish a text reply. Retry or choose another model.');
+      if(typeof data.model!=='string'||normalized(data.model)!==normalized(model))throw Error('Ollama replied using a different model. Select it explicitly and retry.');
+      if(!check.accept(reply))throw Error('The model is connected but did not pass the '+check.id+' check. Retry or choose the balanced model. Reply: '+reply.slice(0,180));
+      checks.push({id:check.id,reply:reply.slice(0,500)});
+    }
+    return {ok:true,providerId:'local',model,reply:checks.map(c=>c.id+': '+c.reply).join(' · '),checks};
   }
   async function pull(model,onProgress) {
     validateModel(model);
@@ -74,7 +79,7 @@ function createLocalSetup({read=()=>null,write=()=>{},api,platform,onChange=()=>
         }
         set({phase:'verifying',message:'Asking the selected model for a real reply. The first load can take a few minutes.',total:null,completed:0});
         const result=await api.verify(model);verifiedModel=model;
-        return set({phase:'ready',busy:false,verified:true,message:'Your local model replied successfully.',reply:result.reply,error:null});
+        return set({phase:'ready',busy:false,verified:true,message:'Connected. Basic arithmetic and instruction checks passed; answer quality can still vary.',reply:result.reply,error:null});
       } catch(error){verifiedModel=null;return set({phase:'attention',busy:false,verified:false,error:error.message,message:'Setup needs attention. Retry to continue.'});}
     }).finally(()=>job=null);return job;
   }

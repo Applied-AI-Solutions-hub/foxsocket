@@ -2,12 +2,12 @@
 
 ## Start with a local model
 
-In alpha.4, choose Host in the installer, open Foxsocket, and choose **Set up local model**. Local chat runs directly on Windows. It does not require Ubuntu, OpenClaw, a cloud account, or an API key.
+In alpha.6, choose Host in the installer, open Foxsocket, and choose **Set up local model**. Local chat runs directly on Windows. It does not require Ubuntu, OpenClaw, a cloud account, or an API key.
 
-1. Start with the small Llama 3.2 1B model. The model download is about 1.3 GB; Ollama requires additional disk space. A larger model may need more memory than this computer has.
+1. Start with the recommended Llama 3.2 3B model. The model download is about 2 GB; Ollama requires additional disk space. A larger model may need more memory than this computer has.
 2. Foxsocket downloads Ollama from its official website, checks the installer signature, installs it for your Windows account, and starts the local service.
 3. Foxsocket downloads your chosen model. The progress panel shows actual transferred bytes/total when available, or an activity indicator when Windows or Ollama has not supplied a total.
-4. Setup verifies the selected model is installed and generates a real text reply. The panel shows that reply. A running Ollama server alone is not a successful setup result.
+4. Setup verifies the selected model is installed and checks basic arithmetic and instruction following through the local chat prompt. The panel shows those replies; this is not a guarantee of general answer quality. A running Ollama server alone is not a successful setup result.
 5. Choose Start a conversation and send your first message.
 
 ## Resume or retry
@@ -34,4 +34,5 @@ Client pairing and remote-device conversation sync are not implemented in this a
 
 - Ollama Windows requirements and installation: https://docs.ollama.com/windows
 - Llama 3.2 models and license: https://ollama.com/library/llama3.2
-- Shared Lenovo test target and results: https://github.com/Applied-AI-Solutions-hub/foxsocket/pull/32
+- Shared Lenovo test target and results: https://github.com/Applied-AI-Solutions-hub/foxsocket/pull/33
+Ollama may open its own welcome window. No sign-in or onboarding there is required for Foxsocket; return to Foxsocket for setup progress.

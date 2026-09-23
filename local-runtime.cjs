@@ -26,7 +26,7 @@ function createWindowsRuntime({directory,api,fetchImpl=fetch,env=process.env,exe
     // Filename is passed through an environment value, never interpreted as code.
     const script="$s=Get-AuthenticodeSignature -LiteralPath $env:FOXSOCKET_INSTALLER; if($s.Status -ne 'Valid' -or $s.SignerCertificate.Subject -notmatch '(?i)Ollama'){exit 1}";
     try{await executeImpl(path.join(env.SystemRoot,'System32','WindowsPowerShell','v1.0','powershell.exe'),['-NoProfile','-NonInteractive','-Command',script],{windowsHide:true,timeout:60000,env:{...env,FOXSOCKET_INSTALLER:target}});}catch{throw Error('The Ollama installer signature could not be verified. Check Windows date and internet access, then retry.');}
-    progress({phase:'installing-runtime',message:'Installing Ollama for your Windows account. This may take several minutes.',total:null,completed:0});
+    progress({phase:'installing-runtime',message:'Installing Ollama for your Windows account. If its welcome window opens, return to Foxsocket; no action there is required.',total:null,completed:0});
     try{await executeImpl(target,['/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-'],{windowsHide:true,timeout:1800000});}catch{throw Error('Ollama installation did not finish. Check any Windows prompt, then retry.');}
     if(!await find())throw Error('Ollama was not found after installation. Retry setup.');
   }
