@@ -1,7 +1,8 @@
 const {app,BrowserWindow,net}=require('electron'),fs=require('fs'),path=require('path');
 const profile=path.join(__dirname,'.qa','updates-'+Date.now());fs.mkdirSync(profile,{recursive:true});app.setPath('userData',profile);
 let calls=0;
-net.fetch=async()=>{calls++;return calls===1?new Response(JSON.stringify([{tag_name:'v0.6.0-alpha.3',assets:[{name:'Setup.exe',state:'uploaded',size:100}]}]),{status:200}):new Response('{}',{status:404});};
+const nextVersion='99.0.0';
+net.fetch=async()=>{calls++;return calls===1?new Response(JSON.stringify([{tag_name:'v'+nextVersion,assets:[{name:'Setup.exe',state:'uploaded',size:100}]}]),{status:200}):new Response('{}',{status:404});};
 app.getVersion=()=>require('./package.json').version;
 require('./main');
 app.whenReady().then(async()=>{
@@ -11,7 +12,7 @@ app.whenReady().then(async()=>{
  const result=await win.webContents.executeJavaScript(`(async()=>{
  const check=(v,m)=>{if(!v)throw Error(m)},wait=ms=>new Promise(r=>setTimeout(r,ms));
  const info=await desktop.invoke('updates-state');check(!document.querySelector('#release-notice').hidden,'Startup update notice: '+JSON.stringify(info));
- check(document.querySelector('#release-notice').textContent.includes('0.6.0-alpha.3'),'New release version');
+ check(document.querySelector('#release-notice').textContent.includes('${nextVersion}'),'New release version');
  document.querySelector('[data-page=settings]').click();
  check(document.querySelector('#release-status').textContent.includes('newer version'),'Settings available state');
  document.querySelector('[data-update=check]').click();await wait(100);

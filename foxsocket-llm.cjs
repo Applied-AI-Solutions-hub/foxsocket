@@ -41,7 +41,7 @@ const PROVIDERS = Object.freeze({
     kind: 'ollama',
     baseUrl: 'http://127.0.0.1:11434/v1',
     models: [],
-    defaultModel: process.env.FOXSOCKET_SPARKY_MODEL || 'hf.co/prism-ml/Bonsai-27B-gguf:Q1_0',
+    defaultModel: process.env.FOXSOCKET_SPARKY_MODEL || require('./local-model.cjs').DEFAULT_MODEL,
     keyEnv: null,
     keyHint: '',
   },

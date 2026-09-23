@@ -31,7 +31,7 @@ Function ChooseRolePage
   ${ElseIf} $SetupRole == "client"
     ${NSD_Check} $ClientChoice
   ${EndIf}
-  ${NSD_CreateLabel} 0 112u 100% 36u "Next checks this PC and explains what is available. OpenClaw, Linux, Tailscale, and AI models are not installed by this check."
+  ${NSD_CreateLabel} 0 112u 100% 36u "Host setup offers a local model with Ollama or hosted provider settings. Local chat runs directly on Windows. Ubuntu/OpenClaw setup is available separately when needed."
   Pop $0
   nsDialogs::Show
 FunctionEnd
@@ -89,7 +89,11 @@ Function ReadinessPage
   Pop $0
   nsDialogs::CreateControl EDIT ${WS_VISIBLE}|${WS_CHILD}|${WS_TABSTOP}|${WS_VSCROLL}|${ES_MULTILINE}|${ES_READONLY}|${ES_AUTOVSCROLL} ${WS_EX_CLIENTEDGE} 0 38u 100% 92u "$ReadinessReport"
   Pop $ReadinessText
-  ${NSD_CreateLabel} 0 136u 100% 30u "Back changes the role. Cancel leaves the app uninstalled. Continue installs the app only; prerequisite setup follows separately."
+  ${If} $SetupRole == "host"
+    ${NSD_CreateLabel} 0 136u 100% 30u "After installation, open Foxsocket to choose your model. Local setup installs Ollama, downloads your chosen model, and verifies a real reply."
+  ${Else}
+    ${NSD_CreateLabel} 0 136u 100% 30u "Continue installs Foxsocket. Linux is not installed for Client computers."
+  ${EndIf}
   Pop $0
   nsDialogs::Show
 FunctionEnd
@@ -109,5 +113,7 @@ FunctionEnd
     FileWrite $0 '{"role":"$SetupRole"}'
     FileClose $0
   ${EndIf}
+  ; First launch opens model setup. Ubuntu/OpenClaw is an explicit optional path
+  ; in the app; it must never gate the native Windows local-model experience.
 !macroend
 !endif

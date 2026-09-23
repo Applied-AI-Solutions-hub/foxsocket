@@ -17,7 +17,7 @@ app.whenReady().then(async()=>{
  try{
   await new Promise(r=>setTimeout(r,400));
   const result=await win.webContents.executeJavaScript(`(async()=>{const $=s=>document.querySelector(s),wait=ms=>new Promise(r=>setTimeout(r,ms)),check=(v,m)=>{if(!v)throw Error(m)};
-   check($('.host-layout'),'Dedicated Host screen');check($('.host-stages').children.length===5,'Real stages');check(!$('#content pre')&&!$('#content .command'),'No terminal commands as primary flow');
+   $('[data-action=legacy-host]').click();await wait(100);check($('.host-layout'),'Optional OpenClaw Host screen');check($('.host-stages').children.length===5,'Real stages');check(!$('#content pre')&&!$('#content .command'),'No terminal commands as primary flow');
    $('[data-host=prepare]').click();await wait(50);check($('[data-host=prepare]').disabled,'Prepare disabled during job');check($('.host-status').textContent.includes('Working'),'Live progress');await wait(350);check($('.host-error').textContent.includes('Windows did not'),'Recovery explains failed component');check(!$('[data-host=prepare]').disabled,'Retry available');
    $('[data-host-tab=agent]').click();$('[data-action=find-agents]').click();await wait(80);check($('#agent-choice').textContent.includes('Test agent'),'Existing agent selection');
    $('[data-host-tab=network]').click();check($('#content').textContent.includes('Not available in this preview'),'Tailscale not confused with pairing');

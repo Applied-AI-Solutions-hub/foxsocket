@@ -15,6 +15,16 @@ module.exports=function register(getWindow,isBusy){
  app.on('browser-window-created',(_,window)=>{finishThenQuit=false;window.on('show',()=>finishThenQuit=false);});
  app.on('before-quit',event=>{if(manager.get().busy&&manager.get().operation==='prepare'){event.preventDefault();finishThenQuit=true;const win=getWindow();if(win&&!win.isDestroyed())win.hide();}});
  ipcMain.handle('host-status',()=>manager.get());
+ ipcMain.handle('host-install-linux',async()=>{
+  if(process.platform!=='win32')throw Error('Host setup requires Windows.');
+  if(manager.get().busy||isBusy())throw Error('Wait for the current operation to finish.');
+  const helper=app.isPackaged?path.join(process.resourcesPath,'host-setup.ps1'):path.join(__dirname,'build','host-setup.ps1');
+  // Fixed packaged helper; renderer cannot choose an executable or arguments.
+  await new Promise((resolve,reject)=>{
+   execFile(path.join(process.env.SystemRoot,'System32','WindowsPowerShell','v1.0','powershell.exe'),['-NoProfile','-STA','-WindowStyle','Hidden','-ExecutionPolicy','Bypass','-File',helper,'-AppPath',process.execPath],{windowsHide:true},error=>{if(error)reject(Error('Windows setup could not finish. Use the setup window to retry.'));else resolve();});
+  });
+  return setup.inspect();
+ });
  ipcMain.handle('host-check',(_,distro)=>{manager.check(distro);return manager.get();});
  ipcMain.handle('host-prepare',(_,distro)=>{if(isBusy())throw Error('Wait until your agent finishes replying before preparing its Host.');manager.prepare(distro);return manager.get();});
  return manager;
