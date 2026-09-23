@@ -57,6 +57,12 @@ Lighting is optional and needs compatible hardware plus a separate local OpenRGB
 
 More Host detail: [Host implementation status](docs/managed-host.md).
 
+## Optional: Sparky Reflex
+
+[Sparky Reflex](https://github.com/Applied-AI-Solutions-hub/sparky-reflex) is a separate, free, local service that routes each chat message in about 50 ms on an NVIDIA GPU. When it's running, confident lighting, tasks and system requests get an instant local reply with a button to the right page, and an **Ask Sparky anyway** option. Everything else goes to your model as usual. When it isn't running, Foxsocket behaves exactly as before.
+
+To try it, follow the Sparky Reflex quick start, then keep `scriptsstart.ps1` running while you use Foxsocket.
+
 ## Report a test result
 
 [Open an issue](https://github.com/Applied-AI-Solutions-hub/foxsocket/issues/new) and include:

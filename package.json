@@ -58,7 +58,8 @@
       "host-ui.js",
       "host-ui.css",
       "build/host-startup.ps1",
-      "starter-agent.json"
+      "starter-agent.json",
+      "reflex-client.cjs"
     ],
     "win": {
       "target": "nsis",
