@@ -1,10 +1,20 @@
 # Managed Host build
 
+## Alpha.4 architecture
+
+Native Windows local chat is the primary Host setup. `local-main.cjs` connects the Electron UI to a persisted `local-model.cjs` state machine and the Windows Ollama installer/startup adapter in `local-runtime.cjs`. Setup installs only after the user's Set up local model action, streams download progress, and verifies the exact model with a finished visible reply. A completed setup is reverified once after reopening; periodic status checks do not generate repeated replies. Missing runtime/model state never triggers an implicit download. Saved errors and interrupted stages remain available through Resume setup.
+
+The installer now opens model setup instead of automatically installing Ubuntu. The older OpenClaw service manager below remains an optional integration; it cannot block direct-provider/local chat. Hosted account access is displayed separately from readiness and a real chat reply is required for readiness in the current app session.
+
+Tests: `node --test local-model.test.cjs local-runtime.test.cjs`, `pnpm exec electron local-smoke.cjs`, plus the existing Host/workspace/update tests. Runtime install, downloads and inference are mocked in automation. Real Ollama installation, model inference and Windows reboot recovery must be verified on the Lenovo.
+
+## Optional OpenClaw manager
+
 The Host page replaces the terminal-command walkthrough with a live control screen. The public starter is a clean Sparky persona, with an editable name and a user-selected model. It must never be populated by exporting the owner's working Sparky agent.
 
 ## Implemented
 
-- Host installation opens a bundled Windows/Ubuntu setup window. It enables WSL with a Windows permission prompt, saves progress through a restart, and installs Ubuntu 24.04 for the original Windows user. A new environment gets a regular `foxsocket` Linux account and systemd automatically; existing environments are preserved. The Host page can reopen this setup.
+- The optional Ubuntu/OpenClaw page opens the bundled Windows/Ubuntu setup window. It enables WSL with a Windows permission prompt, saves progress through a restart, and installs Ubuntu 24.04 for the original Windows user. A new environment gets a regular `foxsocket` Linux account and systemd automatically; existing environments are preserved.
 - Host navigation, responsive control screen, real prerequisite/service/startup checks, progress and recoverable errors.
 - Hidden execution through WSL `--exec`. OpenClaw arguments stay positional, including chat messages containing shell metacharacters.
 - Reuse an existing configured agent. If the CLI is missing, a supported Linux environment can install pinned OpenClaw 2026.9.3 with the official user-prefix installer.

@@ -1,47 +1,54 @@
-# Shared Lenovo handoff
+# Shared Lenovo handoff — alpha.4
 
-**Start with [PR #32](https://github.com/Applied-AI-Solutions-hub/foxsocket/pull/32). Its description and newest test results are the shared record between PCs.** Do not rely on another computer's chat history or local output paths.
+[PR #32](https://github.com/Applied-AI-Solutions-hub/foxsocket/pull/32) is the shared record between PCs. Read its current description and latest comments first. Do not rely on another computer's chat history or local file paths.
 
-## Current target
+## Current target and changes
 
-- Product: Foxsocket on a fresh Windows x64 Lenovo.
-- Test build: `0.6.0-alpha.3` on `fix/installer-host-prerequisites` (PR #32).
-- At the time of this handoff, `main` and the published download still contain alpha.2. Recheck the PR for subsequent changes; do not silently substitute the public release for this test build.
-- Purpose: prove that choosing Host installs Windows/Ubuntu prerequisites, creates the Linux account, and resumes after a restart without manual installation commands.
-- Existing Sparky on the other PC stays intact. Do not copy its accounts, memory, configuration or services onto the Lenovo to make this test pass.
+Use **0.6.0-alpha.4** on `fix/installer-host-prerequisites`. Main and the public release may still be alpha.2; the previous Lenovo test used alpha.3. Use the matching artifact linked in the PR description.
 
-## Get the same installer on either PC
+The alpha.3 test proved Ubuntu setup, but exposed a missing local model backend and an unrelated OpenClaw configuration gate. Alpha.4 makes native Windows local chat the main setup path. Choose Host, then **Set up local model**. Foxsocket installs Ollama, downloads the model with progress, and verifies a real reply from that exact model. No OpenAI key, Ubuntu, or OpenClaw configuration is required for this path.
 
-1. Open PR #32 and the latest successful **Windows test installer** check for its current head commit.
-2. Download the **Foxsocket-Windows-test-installer** artifact from the run summary. GitHub may require sign-in. Extract the ZIP.
-3. Inspect `BUILD-INFO.json`: version must match the PR's current test target and `tested_head_sha` must match the PR head. Verify the installer against the included `SHA256SUMS.txt`. Do not use an older successful run after a newer commit has failed.
-4. If there is no successful artifact, report that on PR #32. A source build is a fallback: preserve local changes, fetch/check out the PR branch, use Node 24 and pnpm 11.19.0, run `pnpm install --frozen-lockfile`, `node node_modules/electron/install.js`, and `pnpm dist`. The installer is under `release/`. Building does not validate first-time installation.
+The first model option is `llama3.2:1b` (about 1.3 GB); `llama3.2:3b` (about 2 GB) is also available. Ollama needs additional disk space. Start with the small model. Performance depends on the Lenovo and must be tested.
 
-## Run the clean-install test
+**Resume setup** is always available in the sidebar and on This PC. The model, stage, and last error are saved. After reopening a completed setup, Foxsocket rechecks a real local reply. Missing software is reported rather than silently downloaded.
 
-1. Record Windows version, current Foxsocket version, and whether Ubuntu/WSL has already been installed. Do not remove existing software merely to recreate a fresh state.
-2. Close Foxsocket and run the test installer. Choose **Host**.
-3. Let its setup window prepare Windows and Ubuntu. The person at the Lenovo approves Windows permission prompts and chooses when to restart after saving work.
-4. Sign back into the same Windows account. Setup should reopen and continue without terminal commands.
-5. Confirm **Ubuntu is ready**, then open Foxsocket and refresh the Host page. Confirm Ubuntu is discovered and record any next blocker.
-6. If it fails, capture the exact stage/message and stop before a manual prerequisite workaround. A workaround can hide an installer defect. Do not disable Windows protection; record any SmartScreen or security block.
+Ubuntu/OpenClaw remains an optional setup under Other setup options. Existing Ubuntu, OpenClaw, models, and working Sparky on the other PC are preserved.
 
-This test has not yet proven a complete first agent reply. OpenClaw provider onboarding remains separate. A green automated build proves packaging and mocked setup checks, not a successful real Windows reboot.
+## Obtain the installer
 
-## Keep both PCs in sync
+Download **Foxsocket-Windows-test-installer** from the latest successful **Windows test installer** run for PR #32's current head. The PR description links the artifact. GitHub sign-in may be required. Extract the ZIP, verify SHA256SUMS.txt, and confirm BUILD-INFO.json matches the PR head. Do not reuse an alpha.3 artifact.
 
-When asked to continue this handoff, Codex should read the PR description and latest comments first, identify the current target commit/build, and work from the Lenovo's actual state. After a test, add a concise result to PR #32 so the other PC can read it. If GitHub writes are unavailable, give the user the result as one copyable note; do not claim it was posted.
+If the build has not passed or the artifact expired, report that on PR #32. Source build fallback: preserve local changes, check out the PR branch, use Node 24 and pnpm 11.19.0, then run `pnpm install --frozen-lockfile`, `node node_modules/electron/install.js`, and `pnpm dist`.
 
-Use this result format, omitting private paths, credentials and account details:
+## Lenovo acceptance test
+
+1. Record Windows version and current Ollama/model/Ubuntu state. Do not remove existing installations or copy working Sparky configuration to make this test pass.
+2. Close Foxsocket. Launch the alpha.4 installer normally from Explorer, outside Codex's shell, so bundled developer tools do not influence readiness. Choose Host and open Foxsocket.
+3. Choose the small local model and Set up local model. Confirm Ollama and model download progress appears. No API key or manual prerequisite commands should be needed.
+4. Confirm the selected model's verification reply appears and setup says ready. Send a normal chat message and verify its reply too.
+5. Navigate to This PC, then Resume setup / view progress. Confirm the model and result are preserved.
+6. If a download fails, record the exact error and retry through Resume setup. Do not manually install a backend to conceal a product defect.
+7. Save other work and restart Windows when ready. Reopen Foxsocket. Confirm it starts/reuses Ollama, rechecks a real reply, and can answer another chat message. Record whether it works after reboot and after closing/reopening the app.
+8. Record any Windows/SmartScreen block without disabling protection.
+
+Automated tests use fake runtimes/model replies. They do not prove Ollama installation or inference on this Lenovo. Hosted API testing is outside this test; no cloud credentials are needed.
+
+## Record the result here
+
+Codex on the Lenovo should post a concise result as a comment on PR #32. Codex on the other PC should read it before making another change. Omit credentials and private paths. If GitHub writes are unavailable, provide one copyable note and say it was not posted.
 
 ```text
-Lenovo test result
+Lenovo alpha.4 test result
 Build / PR head:
 Windows version:
-WSL/Ubuntu state before test:
-Last successful step:
-Exact failure or completion message:
-Restart and automatic resume:
+Ollama/model state before test:
+Installer launched from Explorer:
+Ollama install/start:
+Selected model and download progress:
+Verification reply and normal chat reply:
+Resume setup and retained errors:
+After Windows restart:
+Exact error / last successful step:
 Any manual intervention:
 Next action:
 ```

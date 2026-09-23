@@ -34,7 +34,7 @@ New-Item -ItemType Directory -Force -Path $setupDir | Out-Null
 if (Test-Path -LiteralPath $stateFile) {
     try {
         $saved = Get-Content -LiteralPath $stateFile -Raw | ConvertFrom-Json
-        $script:progress = @{ phase = $saved.phase; boot = $saved.boot; ownsUbuntu = ($saved.ownsUbuntu -eq $true) }
+        $script:progress = @{ phase = $saved.phase; boot = $saved.boot; ownsUbuntu = ($saved.ownsUbuntu -eq $true); message = $saved.message; lastError = $saved.lastError }
     } catch { [System.Windows.Forms.MessageBox]::Show('Saved Host setup could not be read. No Linux environment has been changed.', 'Foxsocket setup') | Out-Null; exit 1 }
 }
 function Save-Progress {
@@ -71,6 +71,8 @@ function Get-UbuntuLauncher {
     throw 'Ubuntu downloaded but its registration launcher is not available yet. Choose Try again to finish installing it.'
 }
 function Write-Stage([string]$Text) {
+    $script:progress.message = $Text
+    Save-Progress
     $status.Text = $Text
     $log.AppendText($Text + [Environment]::NewLine + [Environment]::NewLine)
     [System.Windows.Forms.Application]::DoEvents()
@@ -88,14 +90,45 @@ function Invoke-SetupProcess([string]$Exe, [string]$Arguments, [string]$InputTex
     $process.StartInfo = $info
     try { $null = $process.Start() } catch { throw 'Windows permission was declined or setup could not start. Choose Try again when you are ready.' }
     if (!$Elevate) {
-        $stdout = $process.StandardOutput.ReadToEndAsync()
-        $stderr = $process.StandardError.ReadToEndAsync()
+        $outBuffer = New-Object char[] 1024; $errBuffer = New-Object char[] 1024
+        $outTask = $process.StandardOutput.ReadAsync($outBuffer, 0, $outBuffer.Length)
+        $errTask = $process.StandardError.ReadAsync($errBuffer, 0, $errBuffer.Length)
+        $outDone = $false; $errDone = $false
+        $captured = New-Object Text.StringBuilder
         if ($InputText) { $process.StandardInput.Write($InputText.Replace("`r`n", "`n") + "`n") }
         $process.StandardInput.Close()
     }
     $timer = [Diagnostics.Stopwatch]::StartNew()
-    while (!$process.WaitForExit(100)) {
+    $activity.Style = 'Marquee'
+    while (!$process.HasExited -or (!$Elevate -and (!$outDone -or !$errDone))) {
+        if (!$Elevate) {
+            foreach ($channel in @('out', 'err')) {
+                $task = if ($channel -eq 'out') { $outTask } else { $errTask }
+                $done = if ($channel -eq 'out') { $outDone } else { $errDone }
+                if (!$done -and $task.IsCompleted) {
+                    $count = $task.GetAwaiter().GetResult()
+                    if ($count -eq 0) {
+                        if ($channel -eq 'out') { $outDone = $true } else { $errDone = $true }
+                    } else {
+                        $buffer = if ($channel -eq 'out') { $outBuffer } else { $errBuffer }
+                        $chunk = ([string]::new($buffer, 0, $count)).Replace([string][char]0, '')
+                        $null = $captured.Append($chunk)
+                        if ($captured.Length -gt 65536) { $null = $captured.Remove(0, $captured.Length - 65536) }
+                        $log.AppendText($chunk)
+                        if ($log.TextLength -gt 65536) { $log.Text = $log.Text.Substring($log.TextLength - 65536) }
+                        if ($chunk -match '(\d{1,3}(?:[.,]\d+)?)\s*%') {
+                            $percent = [double]::Parse($matches[1].Replace(',', '.'), [Globalization.CultureInfo]::InvariantCulture)
+                            if ($percent -le 100) { $activity.Style = 'Continuous'; $activity.Value = [int]$percent }
+                        }
+                        if ($channel -eq 'out') { $outTask = $process.StandardOutput.ReadAsync($outBuffer, 0, $outBuffer.Length) }
+                        else { $errTask = $process.StandardError.ReadAsync($errBuffer, 0, $errBuffer.Length) }
+                    }
+                }
+            }
+        }
+        $elapsed.Text = 'Current step active for ' + $timer.Elapsed.ToString('mm\:ss') + '. Keep this window open.'
         [System.Windows.Forms.Application]::DoEvents()
+        Start-Sleep -Milliseconds 100
         if ($timer.Elapsed.TotalSeconds -gt $TimeoutSeconds) {
             # Do not terminate an elevated Windows servicing operation.
             if (!$Elevate) { $process.Kill() }
@@ -103,7 +136,9 @@ function Invoke-SetupProcess([string]$Exe, [string]$Arguments, [string]$InputTex
         }
     }
     $result = @{ code = $process.ExitCode; output = '' }
-    if (!$Elevate) { $result.output = ($stdout.Result + $stderr.Result).Replace([string][char]0, '') }
+    $activity.Style = 'Continuous'; $activity.Value = 0
+    $elapsed.Text = 'Current step finished; checking the result.'
+    if (!$Elevate) { $result.output = $captured.ToString() }
     $process.Dispose()
     return $result
 }
@@ -178,7 +213,7 @@ function Start-HostSetup {
 
 $form = New-Object Windows.Forms.Form
 $form.Text = 'Foxsocket - Prepare this Host'
-$form.ClientSize = New-Object Drawing.Size(650, 420)
+$form.ClientSize = New-Object Drawing.Size(650, 475)
 $form.StartPosition = 'CenterScreen'
 $form.Font = New-Object Drawing.Font('Segoe UI', 10)
 $form.FormBorderStyle = 'FixedDialog'; $form.MaximizeBox = $false
@@ -187,11 +222,17 @@ $status.SetBounds(24, 20, 602, 75)
 $status.Text = 'Foxsocket will prepare Windows and Ubuntu for your agent. Windows may ask for administrator permission and a restart. Your existing Linux environments will be preserved.'
 $log = New-Object Windows.Forms.TextBox
 $log.SetBounds(24, 105, 602, 240); $log.Multiline = $true; $log.ReadOnly = $true; $log.ScrollBars = 'Vertical'
+$activity = New-Object Windows.Forms.ProgressBar
+$activity.SetBounds(24, 355, 602, 16); $activity.MarqueeAnimationSpeed = 35
+$elapsed = New-Object Windows.Forms.Label
+$elapsed.SetBounds(24, 378, 602, 24); $elapsed.Text = 'Progress is saved across Windows restarts.'
+if ($script:progress.message) { $log.AppendText('Previous step: ' + $script:progress.message + [Environment]::NewLine) }
+if ($script:progress.lastError) { $log.AppendText('Last error: ' + $script:progress.lastError + [Environment]::NewLine) }
 $action = New-Object Windows.Forms.Button
-$action.SetBounds(410, 363, 216, 36); $action.Text = 'Prepare this Host'
+$action.SetBounds(410, 420, 216, 36); $action.Text = 'Prepare this Host'
 $later = New-Object Windows.Forms.Button
-$later.SetBounds(24, 363, 160, 36); $later.Text = 'Continue later'
-$form.Controls.AddRange(@($status, $log, $action, $later))
+$later.SetBounds(24, 420, 160, 36); $later.Text = 'Continue later'
+$form.Controls.AddRange(@($status, $log, $activity, $elapsed, $action, $later))
 $script:busy = $false; $script:nextAction = 'setup'
 $later.Add_Click({ $form.Close() })
 $form.Add_FormClosing({ param($sender, $event) if ($script:busy) { $event.Cancel = $true } })
@@ -208,6 +249,7 @@ $action.Add_Click({
             $script:busy = $false; $form.Close()
         } else { Start-HostSetup }
     } catch {
+        $script:progress.lastError = $_.Exception.Message
         Write-Stage $_.Exception.Message
         $script:nextAction = 'setup'; $action.Text = 'Try again'
     } finally { $script:busy = $false; $action.Enabled = $true; $later.Enabled = $true }

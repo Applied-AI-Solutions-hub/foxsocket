@@ -29,9 +29,11 @@ jobs:
         run: node node_modules/electron/install.js
       - name: Check Host setup
         run: |
-          node --test host-manager.test.cjs setup.test.cjs updates.test.cjs
+          node --test host-manager.test.cjs setup.test.cjs updates.test.cjs local-model.test.cjs local-runtime.test.cjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           powershell -NoProfile -ExecutionPolicy Bypass -File build/host-setup.test.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          powershell -NoProfile -ExecutionPolicy Bypass -File build/host-progress.test.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Build Windows installer
         run: pnpm dist
@@ -68,4 +70,4 @@ jobs:
         run: |
           "## Lenovo test installer" >> $env:GITHUB_STEP_SUMMARY
           "[Download installer, checksum, and shared instructions]($env:ARTIFACT_URL)" >> $env:GITHUB_STEP_SUMMARY
-          "This is a test build. The real Windows permission/reboot flow still needs Lenovo verification." >> $env:GITHUB_STEP_SUMMARY
+          "This is a test build. Verify local Ollama installation, a selected-model reply, and recovery after restarting the Lenovo." >> $env:GITHUB_STEP_SUMMARY

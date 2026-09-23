@@ -6,7 +6,7 @@ Open-source personal AI desktop workspace by [Applied AI Solutions](https://appl
 
 This is an **early Windows alpha** for testers. It is not a finished agent hosting platform yet.
 
-> **Set expectations:** installing Foxsocket alone does **not** yet take a fresh PC all the way to a working agent reply. The next installer build includes guided Windows/Ubuntu preparation with restart recovery. OpenClaw provider onboarding and automatic starter provisioning remain separate. The download below is the earlier published alpha; the new prerequisite flow requires a build from this revision.
+> **Current test build: alpha.4.** [PR #32](https://github.com/Applied-AI-Solutions-hub/foxsocket/pull/32) contains the matching installer download and shared Lenovo test instructions. Choose Host, then **Set up local model**. Foxsocket installs Ollama, downloads your model with progress, and verifies a real reply. Local chat runs directly on Windows; Ubuntu/OpenClaw is an optional separate integration. The release link below remains the older public alpha.2.
 
 ## Quick start (Windows testers)
 
@@ -39,6 +39,7 @@ Focus on these paths:
 
 ### In this alpha
 
+- Native Windows local-model setup with Ollama installation, model downloads, a real selected-model reply check, and persistent Resume setup navigation (alpha.4 test build).
 - Desktop install and workspace basics (tasks, notes, folders, settings)
 - Host readiness / service controls for an existing OpenClaw setup
 - Clean **Sparky** starter manifest (rename allowed; no personal credentials or memory bundled)
@@ -46,9 +47,9 @@ Focus on these paths:
 
 ### Not finished yet
 
-- Provider/model account wizard and automatic starter-agent provisioning
-- Fresh-PC validation of the new Windows/Ubuntu installer across real permission prompts and reboots
-- End-to-end “fresh PC → first agent reply” with no prior OpenClaw config
+- Fresh-PC validation of the new Ollama/model setup and revalidation after restarting Windows
+- Embedded OpenClaw provider account wizard and automatic OpenClaw starter provisioning
+- End-to-end “fresh PC → first agent reply” remains an acceptance test; local chat no longer requires OpenClaw configuration
 - Remote application pairing, iPhone/iPad clients, and cross-device conversation sync
 - Treating a connected Tailscale network as app pairing (Tailscale is the intended private path; pairing itself is not implemented)
 - Proven Windows background-task recovery and reboot persistence
