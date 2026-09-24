@@ -42,10 +42,19 @@
     return `<div class="setup-progress">${nav.map(([key,label])=>`<button data-step="${key}" class="${step===key?'current':''}">${label}</button>`).join('')}</div>${body}<div class="actions"><button class="link" data-action="help">Need a hand? Read the step-by-step guide</button><button class="link" data-page="chat">Use workspace for now</button></div>`;
   }
   function render(){
+    const samePage=document.body.dataset.page===page;
+    const oldScroll=samePage?$('.page-scroll')?.scrollTop:null;
+    const focused=samePage&&$('#content').contains(document.activeElement)?document.activeElement.id:null;
+    const expanded=samePage?[...$('#content').querySelectorAll('details')].map(d=>d.open):[];
     retain();sidebar();header();details();document.body.dataset.page=page;
     $('#content').innerHTML=page==='chat'?chat():`<div class="page-scroll"><div class="page-inner">${({files,tasks,devices,settings,setup:setupPage})[page]()}</div></div>`;
     if(page==='chat'){$('#chat-input').value=draft;resize();const m=$('#messages');m.scrollTop=atBottom?m.scrollHeight:scroll;}
     window.appEffects?.render(page);window.releaseUpdates?.render();
+    if(samePage){
+      $('#content').querySelectorAll('details').forEach((d,i)=>{if(i<expanded.length)d.open=expanded[i];});
+      if(focused)document.getElementById(focused)?.focus({preventScroll:true});
+      if(oldScroll!==null&&$('.page-scroll'))$('.page-scroll').scrollTop=oldScroll;
+    }
   }
   async function refresh(){try{gateway=await api.invoke('gateway');providers=await api.invoke('providers-get');}catch{gateway={ok:false};}header();details();const note=$('.composer-note span');if(note&&!sending)note.textContent=gateway.ok?'Connected to '+(gateway.provider||'your model'):'Add ChatGPT, Claude, Grok, or a local model in Settings';}
   async function checkHost(){if(!legacyHost||!selectedDistro)return;host={phase:'checking',busy:true};render();try{await api.invoke('host-check',selectedDistro);}catch(e){host={phase:'attention',busy:false,error:e.message};render();}}
@@ -75,7 +84,7 @@
       if(b.dataset.folder!==undefined)await api.invoke('open-folder',state.folders[Number(b.dataset.folder)]);
       if(b.dataset.delete){state.tasks=state.tasks.filter(t=>t.id!==b.dataset.delete);state={...state,...await api.invoke('save',{tasks:state.tasks})};render();}
       switch(b.dataset.action){
-        case 'prepare-local':{const model=localChoice;local={...local,busy:true,error:null,message:'Starting local setup.'};render();try{await api.invoke('local-prepare',model);}catch(e){local={...local,busy:false,error:e.message};render();}break;}
+        case 'prepare-local':{const model=localChoice;local={...local,busy:true,error:null,message:'Starting local setup.'};render();$('#local-setup-progress')?.scrollIntoView({block:'start',behavior:'instant'});$('#local-setup-progress')?.focus({preventScroll:true});try{await api.invoke('local-prepare',model);}catch(e){local={...local,busy:false,error:e.message};render();}break;}
         case 'legacy-host':legacyHost=true;await checkPc();render();await checkHost();break;
         case 'local-host':legacyHost=false;render();break;
         case 'new': state={...state,...await api.invoke('conversation-new')};draft='';localStorage.removeItem('workspace-draft');sessionStorage.removeItem('workspace-draft');page='chat';render();break;

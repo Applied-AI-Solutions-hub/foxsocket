@@ -22,8 +22,42 @@ test('streamed download handles chunk boundaries and requires final success',asy
  const updates=[];let payload='{"status":"pulling","total":100,"completed":42}\n{"status":"success"}\n';
  const api=createLocalApi({fetchImpl:async()=>new Response(new ReadableStream({start(controller){for(const part of [payload.slice(0,9),payload.slice(9)])controller.enqueue(new TextEncoder().encode(part));controller.close();}}))});
  await api.pull(DEFAULT_MODEL,p=>updates.push(p));assert.equal(updates[0].completed,42);assert.equal(updates[0].total,100);
+ assert.equal(updates[0].message,'Downloading model files.');assert.equal(updates[0].detail,'pulling');
  payload='{"status":"pulling","completed":42}\n';await assert.rejects(api.pull(DEFAULT_MODEL,()=>{}),/interrupted/);
  payload='{"error":"out of space"}\n';await assert.rejects(api.pull(DEFAULT_MODEL,()=>{}),/out of space/);
+});
+
+test('progress bursts are checkpointed, transitions flush, and the checkpoint can resume',async()=>{
+ let time=0,release;const writes=[],updates=[];
+ const pause=new Promise(resolve=>release=resolve);
+ const api={reachable:async()=>true,installed:async()=>false,pull:async(_,progress)=>{
+  for(time=0;time<1000;time++)progress({completed:time,total:1000,message:'Downloading model files.'});
+  await pause;
+ },verify:async()=>({reply:'12 / blue'})};
+ const manager=createLocalSetup({api,platform:{},now:()=>time,write:s=>writes.push(s),onChange:s=>updates.push(s)});
+ const job=manager.prepare(DEFAULT_MODEL);
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(manager.get().completed,999,'memory retains the latest record');
+ const checkpoints=writes.filter(s=>s.phase==='downloading-model'&&s.message==='Downloading model files.');
+ assert.equal(checkpoints.length,4,'1000 progress records produce four checkpoints');
+ assert.equal(checkpoints.at(-1).completed,750);
+ assert.equal(updates.length,writes.length);
+ const resumed=createLocalSetup({api,platform:{},read:()=>writes.at(-1)});
+ assert.equal(resumed.get().phase,'interrupted');assert.equal(resumed.get().model,DEFAULT_MODEL);
+ release();await job;
+ assert.equal(writes.at(-2).phase,'verifying');assert.equal(writes.at(-1).phase,'ready');
+ assert.equal(writes.at(-1).busy,false);assert.equal(writes.at(-1).verified,true);
+});
+
+test('an error immediately flushes even inside the progress throttle window',async()=>{
+ const writes=[];
+ const api={reachable:async()=>true,installed:async()=>false,pull:async(_,progress)=>{
+  progress({completed:1,total:10});progress({completed:2,total:10});throw Error('download stopped');
+ }};
+ const manager=createLocalSetup({api,platform:{},now:()=>0,write:s=>writes.push(s)});
+ await manager.prepare(DEFAULT_MODEL);
+ assert.equal(writes.at(-1).phase,'attention');assert.equal(writes.at(-1).error,'download stopped');
+ assert.equal(writes.at(-1).completed,2);assert.equal(writes.at(-1).busy,false);
 });
 function fixture(saved=null){
  const calls=[],writes=[],updates=[];let reachable=false,downloaded=false,failure=null;

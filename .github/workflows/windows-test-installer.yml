@@ -40,6 +40,8 @@ jobs:
         run: pnpm exec electron local-chat-smoke.cjs
       - name: Check isolated development launch
         run: pnpm exec electron . --foxsocket-dev --fresh --dev-smoke
+      - name: Check setup progress at Lenovo window size
+        run: pnpm exec electron setup-progress-smoke.cjs
       - name: Check signature rejection gate
         run: ./build/verify-signature.test.ps1
       - name: Build Windows installer

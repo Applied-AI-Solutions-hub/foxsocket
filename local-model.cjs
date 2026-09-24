@@ -45,20 +45,34 @@ function createLocalApi({fetchImpl=fetch}={}) {
     const decoder=new TextDecoder();let pending='',success=false;
     const line=text=>{if(!text.trim())return;const item=JSON.parse(text);if(item.error)throw Error(item.error);if(item.status==='success')success=true;
       const total=Number(item.total),completed=Number(item.completed);
-      onProgress({message:String(item.status||'Downloading model').slice(0,160),total:Number.isFinite(total)&&total>0?total:null,completed:Number.isFinite(completed)&&completed>=0?completed:0});};
+      const detail=String(item.status||'').slice(0,160);
+      const message=detail==='success'?'Model download complete.':detail.startsWith('pulling')?'Downloading model files.':detail.startsWith('verifying')?'Checking downloaded model files.':detail.startsWith('writing')?'Saving the model.':'Preparing the model download.';
+      onProgress({message,detail,total:Number.isFinite(total)&&total>0?total:null,completed:Number.isFinite(completed)&&completed>=0?completed:0});};
     for await(const chunk of response.body){pending+=decoder.decode(chunk,{stream:true});if(pending.length>1048576)throw Error('Invalid download progress response.');let pos;while((pos=pending.indexOf('\n'))>=0){line(pending.slice(0,pos));pending=pending.slice(pos+1);}}
     pending+=decoder.decode();line(pending);
     if(!success)throw Error('The model download was interrupted. Resume setup to retry; Ollama can reuse downloaded layers.');
   }
   return {installed,verify,pull,reachable:async()=>{try{await (await request('/api/tags')).json();return true;}catch{return false;}}};
 }
-function createLocalSetup({read=()=>null,write=()=>{},api,platform,onChange=()=>{}}) {
+function createLocalSetup({read=()=>null,write=()=>{},api,platform,onChange=()=>{},now=Date.now}) {
   const saved=read();
   let state={phase:'idle',model:DEFAULT_MODEL,message:'Choose a model to run on this PC.',...saved,busy:false,verified:false};
   if(saved?.busy)state={...state,phase:'interrupted',message:'Setup was interrupted. Resume to continue.',error:saved.error||null};
   if(saved?.phase==='ready')state.message='Last setup succeeded. Checking a fresh reply after reopening.';
   let job=null,verifiedModel=null,rechecked=false;
-  const set=patch=>{state={...state,...patch,updatedAt:Date.now()};write(state);onChange({...state});return {...state};};
+  let lastProgressAt=-Infinity;
+  // Keep every update in memory, but checkpoint progress at most four times a
+  // second. Transitions and terminal results bypass this limit. On interruption
+  // the last checkpoint is sufficient: Ollama owns resumable model layers.
+  const set=(patch,progressOnly=false)=>{
+    const transition=patch.phase!==undefined&&patch.phase!==state.phase;
+    const timestamp=now();
+    if(transition)lastProgressAt=-Infinity;
+    state={...state,...(transition?{detail:null}:{}),...patch,updatedAt:timestamp};
+    if(progressOnly&&!transition&&timestamp-lastProgressAt<250)return {...state};
+    if(progressOnly)lastProgressAt=timestamp;
+    write({...state});onChange({...state});return {...state};
+  };
   function prepare(model=state.model,{install=true}={}) {
     validateModel(model);
     if(job)return job;
@@ -68,14 +82,14 @@ function createLocalSetup({read=()=>null,write=()=>{},api,platform,onChange=()=>
         if(!await api.reachable()) {
           if(!await platform.find()){
             if(!install)throw Error('Ollama is not installed. Choose Set up local model.');
-            await platform.install(update=>set({phase:update.phase||'downloading-runtime',...update}));
+            await platform.install(update=>set({phase:update.phase||'downloading-runtime',...update},true));
           }
           set({phase:'starting',total:null,completed:0,message:'Starting Ollama on this PC.'});await platform.start();
         }
         if(!await api.installed(model)){
           if(!install)throw Error('The selected model is not downloaded. Resume local setup to download it.');
           set({phase:'downloading-model',message:'Requesting the model download.',total:null,completed:0});
-          await api.pull(model,update=>set({phase:'downloading-model',...update}));
+          await api.pull(model,update=>set({phase:'downloading-model',...update},true));
         }
         set({phase:'verifying',message:'Asking the selected model for a real reply. The first load can take a few minutes.',total:null,completed:0});
         const result=await api.verify(model);verifiedModel=model;
