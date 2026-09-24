@@ -1,54 +1,42 @@
-# Shared Lenovo handoff — alpha.4
+# Shared Lenovo handoff — alpha.6
 
-[PR #32](https://github.com/Applied-AI-Solutions-hub/foxsocket/pull/32) is the shared record between PCs. Read its current description and latest comments first. Do not rely on another computer's chat history or local file paths.
+**The owner has chosen to use Lenovo as a development PC.** Continue development with the **Foxsocket-Windows-UNSIGNED-DEVELOPMENT** CI artifact or `pnpm dev:fresh`. See [development setup](docs/development.md) (DEVELOPMENT.md in the artifact) for the explicit owner-controlled Windows setting and commands. No signing account is needed for development.
 
-## Current target and changes
+The previous alpha.6 artifact was blocked by Windows Application Control. That does not halt development: use the current unsigned development artifact on the owner-configured development PC. Read [PR #33](https://github.com/Applied-AI-Solutions-hub/foxsocket/pull/33) and match the commit/checksum, not just alpha.6. Free public signing remains separate and pending.
 
-Use **0.6.0-alpha.4** on `fix/installer-host-prerequisites`. Main and the public release may still be alpha.2; the previous Lenovo test used alpha.3. Use the matching artifact linked in the PR description.
+## Changes from the alpha.5 report
 
-The alpha.3 test proved Ubuntu setup, but exposed a missing local model backend and an unrelated OpenClaw configuration gate. Alpha.4 makes native Windows local chat the main setup path. Choose Host, then **Set up local model**. Foxsocket installs Ollama, downloads the model with progress, and verifies a real reply from that exact model. No OpenAI key, Ubuntu, or OpenClaw configuration is required for this path.
+- Setup now brings progress into view when started and preserves scroll position, keyboard focus, and expanded details during updates. Model downloads use plain-language status, with raw layer identifiers under Download details.
+- Progress saves and UI notifications are limited to one per 250 ms within each phase. Phase changes, errors, and completion save immediately. Abrupt interruption can lose the last fraction of a second of displayed progress; Ollama retains its own resumable download layers.
+- Lighting controls and nonfunctional phone/tablet cards were removed to focus the workspace on agents.
 
-The first model option is `llama3.2:1b` (about 1.3 GB); `llama3.2:3b` (about 2 GB) is also available. Ollama needs additional disk space. Start with the small model. Performance depends on the Lenovo and must be tested.
+- Local chat uses a short neutral prompt instead of the shipped household identity, device graph, and automatic memory instructions. New starter files contain no personal or device facts. Existing agent files are preserved; local chat does not read or modify their graph memory.
+- Setup uses the same local prompt builder as chat and checks arithmetic and a short formatting instruction. A server connection or an arbitrary reply alone cannot pass. Passing two checks does not prove general answer quality.
+- Installer registration is considered stale when no known application executable exists. Valid legacy install locations are retained exactly. Automatic application-folder appending is disabled to avoid `Agent Workspace/Foxsocket` nesting. Already nested installations stay in place for safe upgrades.
+- Foxsocket explains that Ollama may open a welcome window and that no onboarding/sign-in there is required. The backend's installer currently launches that UI; Windows permission prompts are not hidden.
 
-**Resume setup** is always available in the sidebar and on This PC. The model, stage, and last error are saved. After reopening a completed setup, Foxsocket rechecks a real local reply. Missing software is reported rather than silently downloaded.
+## Test the exact installer
 
-Ubuntu/OpenClaw remains an optional setup under Other setup options. Existing Ubuntu, OpenClaw, models, and working Sparky on the other PC are preserved.
+Extract the current development artifact, verify SHA256SUMS.txt and the version/head in BUILD-INFO.json, and launch from Explorer after the owner has configured Windows for development. Expect the development installer to be unsigned. Record the Windows policy state with the results. Do not substitute the older public release.
 
-## Obtain the installer
+The user requires a clean install for each Lenovo iteration. The previous cleanup was incomplete: deletion of leftover model/cache backups was denied by the agent's execution policy. Resolve and document the actual baseline before testing; do not call that state pristine or silently substitute an upgrade. Preserve unrelated user data and working Sparky. Do not manually install a backend to hide a failure.
 
-Download **Foxsocket-Windows-test-installer** from the latest successful **Windows test installer** run for PR #32's current head. The PR description links the artifact. GitHub sign-in may be required. Extract the ZIP, verify SHA256SUMS.txt, and confirm BUILD-INFO.json matches the PR head. Do not reuse an alpha.3 artifact.
+1. Record the detected installation and final path. A removed installation must not produce a misleading legacy upgrade claim. An actual legacy installation may retain its existing folder without appending another Foxsocket folder. Fresh Windows-profile installation and legacy upgrade both need acceptance evidence; do not erase data merely to obtain it.
+2. Open Host → Resume setup. Existing model choices are retained. Select **Recommended · Llama 3.2 3B** (about 2 GB download) and run setup. Record the exact selected model.
+3. Observe runtime/model-layer progress, and whether Ollama opens its own window. Foxsocket should explain that no action there is needed. At 1268 × 666, starting setup should reveal the progress heading. Scroll elsewhere and expand Download details while it runs: subsequent updates should preserve both. Return to Foxsocket for the result.
+4. Confirm both basic checks pass. If either fails, record the visible reply and do not mark answer validation passed.
+5. Choose **New chat** to avoid carrying alpha.5's unrelated conversation into the test. Ask: `This is an installation test. What is 7 plus 5? Answer in one short sentence.` Expect 12. Then ask: `Reply with only the word blue.` Expect blue. Try another ordinary question and assess its answer yourself.
+6. Close and reopen the app. Repeat in a new chat, then confirm the previous conversation remains accessible.
+7. After saving other work, restart Windows, reopen Foxsocket, and repeat a normal chat request. This Windows restart test was not completed on alpha.5.
+8. Check sidebar navigation, Models, Resume setup, the details toggle, resizing, and the absence of sliding animations. If a download fails, verify Resume setup and retained errors; do not claim interrupted-download recovery without observing it.
+9. Uninstall Foxsocket and record the result and signature status. Record any additional blocked executable or script, including optional Ubuntu setup. Successful tests with Smart App Control off do not count as protected consumer-PC acceptance.
 
-If the build has not passed or the artifact expired, report that on PR #32. Source build fallback: preserve local changes, check out the PR branch, use Node 24 and pnpm 11.19.0, then run `pnpm install --frozen-lockfile`, `node node_modules/electron/install.js`, and `pnpm dist`.
+## Report on PR #33
 
-## Lenovo acceptance test
+Codex on the Lenovo should post version/head/checksum, Windows version, starting installation/model state, final installation path, selected model, exact arithmetic/format replies, app reopening and Windows restart results, backend welcome-window behavior, progress/retry observations, and any manual intervention. Separate passed, failed, and untested items. Omit credentials, private paths, and unrelated conversations.
 
-1. Record Windows version and current Ollama/model/Ubuntu state. Do not remove existing installations or copy working Sparky configuration to make this test pass.
-2. Close Foxsocket. Launch the alpha.4 installer normally from Explorer, outside Codex's shell, so bundled developer tools do not influence readiness. Choose Host and open Foxsocket.
-3. Choose the small local model and Set up local model. Confirm Ollama and model download progress appears. No API key or manual prerequisite commands should be needed.
-4. Confirm the selected model's verification reply appears and setup says ready. Send a normal chat message and verify its reply too.
-5. Navigate to This PC, then Resume setup / view progress. Confirm the model and result are preserved.
-6. If a download fails, record the exact error and retry through Resume setup. Do not manually install a backend to conceal a product defect.
-7. Save other work and restart Windows when ready. Reopen Foxsocket. Confirm it starts/reuses Ollama, rechecks a real reply, and can answer another chat message. Record whether it works after reboot and after closing/reopening the app.
-8. Record any Windows/SmartScreen block without disabling protection.
+Carry unresolved findings forward. No public release or full Lenovo acceptance is implied by a successful CI build.
 
-Automated tests use fake runtimes/model replies. They do not prove Ollama installation or inference on this Lenovo. Hosted API testing is outside this test; no cloud credentials are needed.
+## Known open work
 
-## Record the result here
-
-Codex on the Lenovo should post a concise result as a comment on PR #32. Codex on the other PC should read it before making another change. Omit credentials and private paths. If GitHub writes are unavailable, provide one copyable note and say it was not posted.
-
-```text
-Lenovo alpha.4 test result
-Build / PR head:
-Windows version:
-Ollama/model state before test:
-Installer launched from Explorer:
-Ollama install/start:
-Selected model and download progress:
-Verification reply and normal chat reply:
-Resume setup and retained errors:
-After Windows restart:
-Exact error / last successful step:
-Any manual intervention:
-Next action:
-```
+The earlier Lenovo retest passed automatic runtime/model installation and app reopening, but failed the two-turn arithmetic → one-word-blue instruction. That answer-quality issue remains open. Download inactivity feedback and cancel controls, explicit ownership/start/stop controls for Ollama, agent naming and compatible OpenClaw skills, full Windows reboot/inference, and uninstall acceptance remain pending. Closing Foxsocket does not currently promise to stop Ollama; do not terminate a shared runtime or erase unrelated models as a workaround.

@@ -6,9 +6,11 @@ Open-source personal AI desktop workspace by [Applied AI Solutions](https://appl
 
 This is an **early Windows alpha** for testers. It is not a finished agent hosting platform yet.
 
-> **Current test build: alpha.4.** [PR #32](https://github.com/Applied-AI-Solutions-hub/foxsocket/pull/32) contains the matching installer download and shared Lenovo test instructions. Choose Host, then **Set up local model**. Foxsocket installs Ollama, downloads your model with progress, and verifies a real reply. Local chat runs directly on Windows; Ubuntu/OpenClaw is an optional separate integration. The release link below remains the older public alpha.2.
+> **Lenovo testing blocked: the alpha.6 installer is unsigned and Windows Application Control rejected it.** Do not retry that artifact. [PR #33](https://github.com/Applied-AI-Solutions-hub/foxsocket/pull/33) tracks the fixes and [shared test instructions](LENOVO-START-HERE.md). New distributable builds require verified publisher signatures; [one-time signing setup](docs/windows-signing.md) is still pending. The public alpha.2 release below is historical and does not fix this policy block.
 
 ## Quick start (Windows testers)
+
+**Developing Foxsocket now:** the Lenovo is an owner-selected development PC. Use the current PR's **Foxsocket-Windows-UNSIGNED-DEVELOPMENT** artifact, or run `pnpm dev:fresh` from source. [Development setup and Windows policy instructions](docs/development.md). Free public signing is a separate task and does not prevent development.
 
 1. Download the installer: [**Foxsocket.Setup.0.6.0-alpha.2.exe**](https://github.com/Applied-AI-Solutions-hub/foxsocket/releases/download/v0.6.0-alpha.2/Foxsocket.Setup.0.6.0-alpha.2.exe)
 2. Run it, pick an install location, then launch Foxsocket.
@@ -39,7 +41,7 @@ Focus on these paths:
 
 ### In this alpha
 
-- Native Windows local-model setup with Ollama installation, model downloads, a real selected-model reply check, and persistent Resume setup navigation (alpha.4 test build).
+- Native Windows local-model setup with Ollama installation, model downloads, a real selected-model reply check, and persistent Resume setup navigation (alpha.6 test build).
 - Desktop install and workspace basics (tasks, notes, folders, settings)
 - Host readiness / service controls for an existing OpenClaw setup
 - Clean **Sparky** starter manifest (rename allowed; no personal credentials or memory bundled)
@@ -55,7 +57,7 @@ Focus on these paths:
 - Proven Windows background-task recovery and reboot persistence
 - The new 3D mascot model (not integrated)
 
-Lighting is optional and needs compatible hardware plus a separate local OpenRGB SDK server. Support is device-specific.
+Foxsocket focuses on local model setup and an agent workspace. RGB lighting controls are not part of the app.
 
 More Host detail: [Host implementation status](docs/managed-host.md).
 

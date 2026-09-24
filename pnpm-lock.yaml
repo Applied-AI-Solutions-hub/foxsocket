@@ -17,9 +17,6 @@ importers:
       motion:
         specifier: ^13.2.0
         version: 13.2.0
-      openrgb-sdk:
-        specifier: ^0.6.0
-        version: 0.6.0
     devDependencies:
       electron:
         specifier: ^40.0.0
@@ -626,9 +623,6 @@ packages:
 
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
-
-  bufferpack@0.0.6:
-    resolution: {integrity: sha512-MTWvLHElqczrIVhge9qHtqgNigJFyh0+tCDId5yCbFAfuekHWIG+uAgvoHVflwrDPuY/e47JE1ki5qcM7w4uLg==}
 
   builder-util-runtime@9.7.0:
     resolution: {integrity: sha512-g/kR520giAFYkSXTzcmF3kqQq7wi8F6N6SzeDgZrqTBN+VHdmgWOyTdD1yD7AATDId/yXLvuP34CxW46/BwCdw==}
@@ -1238,10 +1232,6 @@ packages:
 
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
-
-  openrgb-sdk@0.6.0:
-    resolution: {integrity: sha512-DXY341jLmvldF4ikZp/f4zES4fhSgADOmuTAoO///7bcWglv5xLnmyZrAYI4qbE9eD7UhQaLwcEm8RYJkwQ2bQ==}
-    engines: {node: '>=8.3'}
 
   p-cancelable@2.1.1:
     resolution: {integrity: sha512-BZOr3nRQHOntUjTrH8+Lh54smKHoHyur8We1V8DSMVrl5A2malOOwuJRnKRDjSnkoeBh4at6BwEnb5I7Jl31wg==}
@@ -2140,8 +2130,6 @@ snapshots:
 
   buffer-from@1.1.2: {}
 
-  bufferpack@0.0.6: {}
-
   builder-util-runtime@9.7.0(supports-color@7.2.0):
     dependencies:
       debug: 4.4.3(supports-color@7.2.0)
@@ -2822,10 +2810,6 @@ snapshots:
   once@1.4.0:
     dependencies:
       wrappy: 1.0.2
-
-  openrgb-sdk@0.6.0:
-    dependencies:
-      bufferpack: 0.0.6
 
   p-cancelable@2.1.1: {}
 

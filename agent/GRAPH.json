@@ -1,50 +1,8 @@
 {
   "version": 1,
   "updatedAt": null,
-  "nodes": [
-    {
-      "id": "applied",
-      "kind": "person",
-      "label": "Applied"
-    },
-    {
-      "id": "sparky",
-      "kind": "agent",
-      "label": "Sparky",
-      "type": "foxsocket.host",
-      "place": "HomePC",
-      "model": "hf.co/prism-ml/Bonsai-27B-gguf:Q1_0"
-    },
-    {
-      "id": "kit",
-      "kind": "agent",
-      "label": "Kit",
-      "type": "foxsocket.device",
-      "place": "iPhone",
-      "model": "hf.co/prism-ml/Bonsai-8B-gguf:Q1_0"
-    },
-    {
-      "id": "nox",
-      "kind": "agent",
-      "label": "Nox",
-      "type": "foxsocket.device",
-      "place": "iPad",
-      "model": "hf.co/prism-ml/Bonsai-8B-gguf:Q1_0"
-    },
-    {
-      "id": "homepc",
-      "kind": "place",
-      "label": "HomePC",
-      "gpu": "RTX 5060 Ti 16GB"
-    }
-  ],
-  "edges": [
-    { "from": "applied", "rel": "owns", "to": "homepc" },
-    { "from": "sparky", "rel": "hosts", "to": "homepc" },
-    { "from": "kit", "rel": "checks-in-with", "to": "sparky" },
-    { "from": "nox", "rel": "checks-in-with", "to": "sparky" },
-    { "from": "applied", "rel": "talks-to", "to": "sparky" }
-  ],
+  "nodes": [],
+  "edges": [],
   "facts": [],
   "episodes": []
 }

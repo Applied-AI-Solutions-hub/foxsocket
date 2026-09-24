@@ -8,7 +8,7 @@
     if(document.body.dataset.page!=='settings')return;
     const content=document.querySelector('#content .page-inner')||document.querySelector('#content');
     let panel=document.querySelector('#release-settings');
-    if(!panel){panel=document.createElement('section');panel.id='release-settings';panel.className='panel';panel.innerHTML=`<h2>App updates</h2><p id="release-status" role="status"></p><small id="release-details"></small><div class="actions"><button data-update="check">Check now</button><button data-update="open">View releases</button></div><small>Foxsocket checks public GitHub releases. No GitHub account or token is needed.</small>`;content.prepend(panel);}
+    if(!panel){panel=document.createElement('section');panel.id='release-settings';panel.className='panel';panel.innerHTML=`<h2>App updates</h2><p id="release-status" role="status"></p><small id="release-details"></small><div class="actions"><button data-update="check">Check now</button><button data-update="open">View releases</button></div><small>Foxsocket checks public GitHub releases. No GitHub account or token is needed.</small>`;content.append(panel);}
     panel.querySelector('#release-status').textContent=descriptions[current.status]||descriptions.unavailable;
     panel.querySelector('#release-details').textContent=`Installed: ${current.current||'—'} · ${current.channel||'Release'} channel${current.checkedAt?' · Checked '+new Date(current.checkedAt).toLocaleTimeString():''}`;
     panel.querySelector('[data-update=check]').disabled=current.status==='checking';

@@ -1,11 +1,14 @@
 {
   "name": "foxsocket",
-  "version": "0.6.0-alpha.4",
-  "description": "Foxsocket Host for this PC — Sparky, your models, your devices",
+  "version": "0.6.0-alpha.6",
+  "description": "Foxsocket - a local AI assistant workspace",
   "license": "MIT",
   "author": "Applied AI Solutions",
   "main": "main.js",
   "scripts": {
+    "dev": "node build-ui.mjs && electron . --foxsocket-dev",
+    "dev:fresh": "node build-ui.mjs && electron . --foxsocket-dev --fresh",
+    "dist:dev": "node build/dev-build.cjs",
     "start": "node build-ui.mjs && electron .",
     "package": "node build-ui.mjs && electron-builder --config electron-builder.cjs --win dir",
     "dist": "node build-ui.mjs && node build/render-maker.cjs && electron-builder --config electron-builder.cjs --win nsis",
@@ -38,10 +41,8 @@
       "docs/fresh-pc-setup.md",
       "preload.js",
       "index.html",
-      "app.js",
       "style.css",
       "assets/**/*",
-      "lighting.js",
       "polish.css",
       "finish.css",
       "finish.js",
@@ -62,17 +63,25 @@
       "local-model.cjs",
       "local-runtime.cjs",
       "local-main.cjs",
-      "local-ui.js"
+      "local-ui.js",
+      "quiet-workspace.css",
+      "local-chat.cjs"
     ],
     "win": {
       "target": "nsis",
-      "signExecutable": false,
+      "forceCodeSigning": true,
+      "signExts": [
+        ".exe",
+        ".dll",
+        ".node",
+        ".ps1"
+      ],
       "icon": "assets/icon.ico"
     },
     "nsis": {
       "oneClick": false,
       "perMachine": false,
-      "allowToChangeInstallationDirectory": true,
+      "allowToChangeInstallationDirectory": false,
       "createDesktopShortcut": true
     },
     "directories": {
@@ -82,7 +91,6 @@
   "dependencies": {
     "@awesome.me/webawesome": "^3.12.0",
     "animejs": "^4.5.0",
-    "motion": "^13.2.0",
-    "openrgb-sdk": "^0.6.0"
+    "motion": "^13.2.0"
   }
 }
