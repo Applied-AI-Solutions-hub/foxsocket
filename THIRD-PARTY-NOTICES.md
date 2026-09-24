@@ -7,4 +7,4 @@ Foxsocket's original code is MIT licensed. Third-party components retain their o
 - Electron and Chromium: see LICENSE.electron.txt and LICENSES.chromium.html in the installed application directory.
 - Node dependencies retain license files in the packaged dependency tree. pnpm-lock.yaml identifies the source dependency versions.
 
-OpenClaw, Tailscale, OpenRGB and model weights are separate products. This installer does not bundle their executables or model weights. Runtime downloads and provider accounts are separate from Foxsocket's license. No third-party affiliation or endorsement is implied.
+OpenClaw, Tailscale and model weights are separate products. This installer does not bundle their executables or model weights. Runtime downloads and provider accounts are separate from Foxsocket's license. No third-party affiliation or endorsement is implied.

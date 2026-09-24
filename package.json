@@ -1,7 +1,7 @@
 {
   "name": "foxsocket",
   "version": "0.6.0-alpha.6",
-  "description": "Foxsocket Host for this PC — Sparky, your models, your devices",
+  "description": "Foxsocket - a local AI assistant workspace",
   "license": "MIT",
   "author": "Applied AI Solutions",
   "main": "main.js",
@@ -41,10 +41,8 @@
       "docs/fresh-pc-setup.md",
       "preload.js",
       "index.html",
-      "app.js",
       "style.css",
       "assets/**/*",
-      "lighting.js",
       "polish.css",
       "finish.css",
       "finish.js",
@@ -72,7 +70,12 @@
     "win": {
       "target": "nsis",
       "forceCodeSigning": true,
-      "signExts": [".exe", ".dll", ".node", ".ps1"],
+      "signExts": [
+        ".exe",
+        ".dll",
+        ".node",
+        ".ps1"
+      ],
       "icon": "assets/icon.ico"
     },
     "nsis": {
@@ -88,7 +91,6 @@
   "dependencies": {
     "@awesome.me/webawesome": "^3.12.0",
     "animejs": "^4.5.0",
-    "motion": "^13.2.0",
-    "openrgb-sdk": "^0.6.0"
+    "motion": "^13.2.0"
   }
 }

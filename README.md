@@ -57,7 +57,7 @@ Focus on these paths:
 - Proven Windows background-task recovery and reboot persistence
 - The new 3D mascot model (not integrated)
 
-Lighting is optional and needs compatible hardware plus a separate local OpenRGB SDK server. Support is device-specific.
+Foxsocket focuses on local model setup and an agent workspace. RGB lighting controls are not part of the app.
 
 More Host detail: [Host implementation status](docs/managed-host.md).
 
