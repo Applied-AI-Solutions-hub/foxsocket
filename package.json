@@ -62,6 +62,7 @@
     ],
     "win": {
       "target": "nsis",
+      "artifactName": "Foxsocket.Setup.${version}.${ext}",
       "signExecutable": false,
       "icon": "assets/icon.ico"
     },
